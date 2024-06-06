@@ -2,6 +2,8 @@ import React from 'react'
 import SideDashboard from '../Components/SideDashboard'
 import TopDashboard from '../Components/TopDashboard'
 import Images from './Images'
+import { Link, useNavigate } from 'react-router-dom';
+
 
 
 function Index() {
@@ -33,7 +35,7 @@ function Index() {
                                     </div>                               
                                 </div>
                                 <div class="d-flex">
-                                       <a class="btn btn-primary btn-sm float-end mt-5" href="#">View All Accounts</a>
+                                       <Link class="btn btn-primary btn-sm float-end mt-5" to="#">View All Accounts</Link>
                                 </div>
                             </div>
                         </div>
@@ -49,8 +51,8 @@ function Index() {
                                     <img src={Images.lady} className="mb-2" alt='wallet'/>
                                 </div>
                                 <div class="d-flex justify-content-between flex-wrap align-items-center">
-                                       <a class="btn btn-primary btn-sm float-end" href="#">Change Wallet</a>
-                                       <a class="btn btn-primary btn-sm float-end" href="#">Add New Wallet</a>
+                                       <Link class="btn btn-primary btn-sm float-end" to="#">Change Wallet</Link>
+                                       <Link class="btn btn-primary btn-sm float-end" to="#">Add New Wallet</Link>
                                 </div>
                             </div>
                         </div>

@@ -1,5 +1,5 @@
 import React from 'react'
-import Images from './Images'
+import { Link, useNavigate } from 'react-router-dom';
 import TopDashboard from '../Components/TopDashboard'
 import SideDashboard from '../Components/SideDashboard'
 
@@ -20,16 +20,16 @@ function Settings() {
                             <div class="custom-tab-1">
                                 <ul class="nav nav-tabs">
                                     <li class="nav-item">
-                                        <a class="nav-link ps-0 active" data-bs-toggle="tab" href="#Profile"> Profile</a>
+                                        <Link class="nav-link ps-0 active" data-bs-toggle="tab" to="#Profile"> Profile</Link>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" data-bs-toggle="tab" href="#Users"> Users</a>
+                                        <Link class="nav-link" data-bs-toggle="tab" to="#Users"> Users</Link>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" data-bs-toggle="tab" href="#Webhooks">Webhooks</a>
+                                        <Link class="nav-link" data-bs-toggle="tab" to="#Webhooks">Webhooks</Link>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" data-bs-toggle="tab" href="#Whitelists">IP Whitelists</a>
+                                        <Link class="nav-link" data-bs-toggle="tab" to="#Whitelists">IP Whitelists</Link>
                                     </li>                                
                                 </ul>
                                 <div class="tab-content">
@@ -128,7 +128,7 @@ function Settings() {
                                                             </div> 
                                                         </div>                                                        
                                                         <div class="d-flex justify-content-end">
-                                                            <button class="btn btn-primary btn-xs mt-5" href="#">Update Details</button>
+                                                            <button class="btn btn-primary btn-xs mt-5" to="#">Update Details</button>
                                                         </div>
                                                     </div>    
                                                 </div>
@@ -144,16 +144,16 @@ function Settings() {
                                                         <input type="text" class="form-control h-60" placeholder="Search"/>
                                                         <div class="input-group-append">
                                                             <span class="input-group-text h-60">
-                                                                <a href="#">
+                                                                <Link to="#">
                                                                     <i class="flaticon-381-search-2"></i>
-                                                                </a>
+                                                                </Link>
                                                             </span>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 
                                                 <div className='col-md-7 align-items-center d-flex justify-content-end'>
-                                                        <button class="btn btn-primary btn-xs mt-2" href="#">Create New User</button>
+                                                        <button class="btn btn-primary btn-xs mt-2" to="#">Create New User</button>
                                                 </div>                       
                                             </div>
                                           <div class="card overflow-hidden min-h-350">                           
@@ -187,8 +187,8 @@ function Settings() {
                                                                                 <svg width="20px" height="20px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"/><circle fill="#000000" cx="5" cy="12" r="2"/><circle fill="#000000" cx="12" cy="12" r="2"/><circle fill="#000000" cx="19" cy="12" r="2"/></g></svg>
                                                                             </button>
                                                                             <div class="dropdown-menu">
-                                                                                <a class="dropdown-item" href="#">Add Role</a>
-                                                                                <a class="dropdown-item" href="#">Block User</a>
+                                                                                <Link class="dropdown-item" to="#">Add Role</Link>
+                                                                                <Link class="dropdown-item" to="#">Block User</Link>
                                                                             </div>
                                                                         </div>
                                                                     </td>                                            
@@ -207,8 +207,8 @@ function Settings() {
                                                                                 <svg width="20px" height="20px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"/><circle fill="#000000" cx="5" cy="12" r="2"/><circle fill="#000000" cx="12" cy="12" r="2"/><circle fill="#000000" cx="19" cy="12" r="2"/></g></svg>
                                                                             </button>
                                                                             <div class="dropdown-menu">
-                                                                                <a class="dropdown-item" href="#">Add Role</a>
-                                                                                <a class="dropdown-item" href="#">Block User</a>
+                                                                                <Link class="dropdown-item" to="#">Add Role</Link>
+                                                                                <Link class="dropdown-item" to="#">Block User</Link>
                                                                             </div>
                                                                         </div>
                                                                     </td>                                            
@@ -227,7 +227,7 @@ function Settings() {
                                         <div class="pt-4">
                                             <div class="row p-0 mb-4">                                               
                                                 <div className='col-md-12 align-items-center d-flex justify-content-end'>
-                                                        <button class="btn btn-primary btn-xs mt-2" href="#">Add New Webhook</button>
+                                                        <button class="btn btn-primary btn-xs mt-2" to="#">Add New Webhook</button>
                                                 </div>                       
                                             </div>
                                           <div class="card overflow-hidden min-h-350">                           
@@ -268,7 +268,7 @@ function Settings() {
                                         <div class="pt-4">
                                             <div class="row p-0 mb-4">                                               
                                                 <div className='col-md-12 align-items-center d-flex justify-content-end'>
-                                                        <button class="btn btn-primary btn-xs mt-2" href="#">Add New IP</button>
+                                                        <button class="btn btn-primary btn-xs mt-2" to="#">Add New IP</button>
                                                 </div>                       
                                             </div>
                                           <div class="card overflow-hidden min-h-350">                           

@@ -2,9 +2,6 @@ import React, { useEffect, useState } from 'react'
 import Images from './Images'
 import { Link, useNavigate} from 'react-router-dom'
 import Myfunctions from '../js/MyFuntions'
-import Apphelpers from '../js/Apphelpers'
-import { appState } from '../js/Context/State'
-
 
 
 function Signup() {
@@ -22,10 +19,10 @@ function Signup() {
         <div class="SignupBody authincation">
                 <div class="container">
                     <div class="row justify-content-center h-100- align-items-center">
-                        <div class="col-md-8">
+                        <div class="col-lg-8 col-md-12">
                             <div class="authincation-content">
                                 <div class="row no-gutters">
-                                    <div class="col-xl-12">
+                                    <div class="col-xl-12 ">
                                         <div class="auth-form">
                                             <div class="text-center mb-3">
                                                 <img className='logo-img' src={Images.logo} alt=""/>

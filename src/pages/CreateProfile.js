@@ -11,15 +11,14 @@ const { Option } = Select;
 
 function CreateProfile() {
 
-    const { userData } = useStoreSelector(["userData"]);
+    const navigate = useNavigate();
 
-    const { profileProgress, setProfileProgress } = useStoreSelector(["profileProgress", "SetProfileProgress"]);
+    const { setProfileProgress } = useStoreSelector(["SetProfileProgress"]);
 
     useEffect(() => {
         Myfunctions.ProfileProgress(navigate, setProfileProgress)
      }, [])
 
-    const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
 
     const OPTIONS = ['Private Unlimited', 'LTD', 'Plc', 'Old Public Company', 'Private Unlimited Nsc', 'Assurance Company', 'Oversea Company', 'Eeig', 'Icvc Securities', 'Icvc Warrants', 'Royal Charter', 'Unregitered Company', 'Others'];
@@ -29,7 +28,6 @@ function CreateProfile() {
     const [selectedIndustry, setSelectedIndustry] = useState(null);
     const [selectedCountry, setSelectedCountry] = useState(null);
     const [selectedState, setSelectedState] = useState(null);
-    const [stateOptions, setStateOptions] = useState([]);
 
 
     const handleSubmit = (e) => {
@@ -161,7 +159,7 @@ function CreateProfile() {
                                                                 className='form-control bg-white p-0'
                                                                 value={selectedState}
                                                                 onChange={(value) => setSelectedState(value)}
-                                                                disabled={!selectedCountry} // Disable the select if no country is selected
+                                                                disabled={!selectedCountry}
                                                             >
                                                                 {selectedCountry && State.getStatesOfCountry(selectedCountry.isoCode).map(state => (
                                                                     <Option key={state.name} value={state.name}>

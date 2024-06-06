@@ -26,7 +26,7 @@ function ApiKeys() {
                                                 <h2 class="font-w600 mb-3 text-white">How it works</h2>
                                                 <p class="text-white mb-6">Authenticate your API requests by including your tokens or keys to <br/>the Authorization header of each request you make. You can manage <br/> your API keys from this module</p>
                                                 <div class="d-flex">
-                                                    <a class="btn btn-primary btn-sm float-end" href="#">Create A New Application </a>
+                                                    <Link class="btn btn-primary btn-sm float-end" to="#">Create A New Application </Link>
                                                 </div>   
                                             </div>
                                             <img src={Images.api} className="mb-2" alt='wallet'/>

@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Images from './Images'
-import { Link, useNavigate} from 'react-router-dom'
+import { useNavigate} from 'react-router-dom'
 import Myfunctions from '../js/MyFuntions'
-import Apphelpers from '../js/Apphelpers'
-import { appState } from '../js/Context/State'
 import { Select } from 'antd';
 import { Country, State } from 'country-state-city';
 const { Option } = Select;
@@ -19,7 +17,6 @@ function DirectorProfile() {
 
     const [selectedCountry, setSelectedCountry] = useState(null);
     const [selectedState, setSelectedState] = useState(null);
-    const [stateOptions, setStateOptions] = useState([]);
 
     useEffect(() => {
         document.title = "Merchant Signup - Hellome Merchant"
