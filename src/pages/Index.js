@@ -28,8 +28,7 @@ function Index() {
                                     <div class="mb-2">
                                         <select class="form-control h-43">
                                             <option selected>Account</option>
-                                            <option>Jakarta, IDN</option>
-                                            <option>Surabaya, IDN</option>
+                                            <option></option>
                                         </select>
                                     </div>                               
                                 </div>
