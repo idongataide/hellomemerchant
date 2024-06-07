@@ -23,6 +23,11 @@ function Signin() {
         }
     };
 
+    const [passwordShown1, setPasswordShown1] = useState(false);
+    const togglePasswordVisiblity1 = () => {
+       setPasswordShown1(passwordShown1 ? false : true);
+    }   
+
     return (
         <div>
             <div className="LoginBody authincation h-100">
@@ -43,8 +48,14 @@ function Signin() {
                                                 </div>
                                                 <div className="form-group">
                                                     <label className="mb-1"><strong>Password *</strong></label>
-                                                    <input type="password" name='password' className="form-control" placeholder='Enter your password' />
+                                                    <div className='input-group transparent-append'>
+                                                    <input type={passwordShown1 ? "text" : "password"} name='password' placeholder='Enter your password' class="form-control password" />
+                                                      <span class="input-group-text pointer" >
+                                                        <i onClick={togglePasswordVisiblity1} className={passwordShown1 ? "fa fa-eye-slash toggle-password" : "fa fa-eye toggle-password"}></i>
+                                                    </span>
+                                                    </div>
                                                 </div>
+                                               
                                                 <div className="form-row d-flex justify-content-between mt-4 mb-2">
                                                     <div className="form-group">
                                                         <div className="custom-control custom-checkbox ms-1">

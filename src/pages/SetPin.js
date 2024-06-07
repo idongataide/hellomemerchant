@@ -25,7 +25,7 @@ const navigate = useNavigate()
                                         <div className="text-center mb-3">
                                             <img  src={Images.logo} alt=""/>
                                         </div>
-                                        <h3 className="text-center mb-2 text-secondary">Set verification</h3>
+                                        <h3 className="text-center mb-2 text-secondary">Verify Account</h3>
                                         <p className='sub-text'>Kindly set your pin to secure your account</p>
                                         <form>
                                             <div class="row">

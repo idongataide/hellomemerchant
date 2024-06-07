@@ -17,6 +17,7 @@ import SetPin from './pages/SetPin';
 import AccountSetup from './pages/AccountSetup';
 import CreateProfile from './pages/CreateProfile';
 import DirectorProfile from './pages/DirectorProfile';
+import UpdatePassword from './pages/UpdatePassword';
 
 
 function App() {
@@ -37,6 +38,8 @@ function App() {
                   <Route path="/Otp"  element={<Otp/>}/>
                   <Route path="/set-pin"  element={<SetPin/>}/>
                   <Route path="/forgot-password"  element={<ForgotPassword/>}/>
+                  <Route path="/reset_password"  element={<UpdatePassword/>}/>
+                  <Route path="/reset_password/:token"  element={<UpdatePassword/>}/>
                   <Route path="/index" element={<Index/>} /> 
                   <Route path="/product" element={<Product/>} /> 
                   <Route path="/api" element={<ApiKeys/>} /> 

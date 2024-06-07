@@ -3,23 +3,27 @@ import Images from './Images';
 import { Link, useNavigate } from 'react-router-dom';
 import Myfunctions from '../js/MyFuntions';
 import OtpInput from 'react-otp-input';
-import useStore, { useStoreSelector } from '../js/Store/useStore';
+import useStore, { useStoreSelector } from '../js/Store/useStore'; 
 
 
 
 function AccountSetup() {
-    const { userData, profileProgress } = useStoreSelector(["userData", "profileProgress"]);
+
+
+    const navigate = useNavigate();
 
     const { setProfileProgress } = useStoreSelector(["setProfileProgress"]);
 
+    const { userData, profileProgress } = useStoreSelector(["userData", "profileProgress"]);
+
 
     useEffect(() => {
-        Myfunctions.ProfileProgress(navigate, setProfileProgress)
-     }, [])
-
+        Myfunctions.ProfileProgress(navigate, setProfileProgress);
+    }, [navigate, setProfileProgress]);
+ 
+     
     const [pin, setPin] = useState('');
     const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
 
     const fileInputCACRef = useRef(null);
 
@@ -179,7 +183,7 @@ function AccountSetup() {
                 <div className="modal-dialog modal-dialog-centered" role="document">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
+                            <button type="button" id='closePin' className="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div className="modal-body">
                             <h3 className="text-center mb-2 text-secondary">Set Pin</h3>
@@ -199,7 +203,7 @@ function AccountSetup() {
                                     </div>
                                 </div>
                                 <div className="text-center mt-4 pb-3">
-                                    <button type="button" onClick={(e) => { Myfunctions.SetPin(e, navigate, setLoading) }} className="btn btn-primary btn-block">Submit</button>
+                                    <button type="button" onClick={(e) => { Myfunctions.SetPin(e, navigate, setLoading) }}  disabled={loading} className="btn btn-primary btn-block">{loading && <span className='spinner-border'></span>}{loading ? 'Signing in...' : 'Submit'}</button>
                                 </div>
                             </form>
                         </div>
@@ -211,17 +215,17 @@ function AccountSetup() {
                 <div className="modal-dialog modal-dialog-centered" role="document">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
+                            <button type="button" id="closeBVN" className="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div className="modal-body">
                             <h3 className="text-center mb-2 text-secondary">Verify your BVN</h3>
-                            <form action='#' onSubmit={(e) => { Myfunctions.ForgotPassword(e, navigate, setLoading) }}>
+                            <form action='#' onSubmit={(e) => { Myfunctions.BVN(e, setLoading) }}>
                                 <div className="form-group mb-4 mt-3">
                                     <label className="mb-1"><strong>Enter BVN </strong></label>
-                                    <input type="email" name='email' className="form-control" placeholder='Enter your BVN' />
+                                    <input type="text" name='bvn' className="form-control" placeholder='Enter your BVN' />
                                 </div>
                                 <div className="text-center">
-                                    <button type="submit" className="btn btn-primary btn-block">Proceed</button>
+                                    <button type="submit" disabled={loading} className="btn btn-primary btn-block">{loading && <span className='spinner-border'></span>}{loading ? 'Signing in...' : 'Submit'}</button>
                                 </div>
                             </form>
                         </div>

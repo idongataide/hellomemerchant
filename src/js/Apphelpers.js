@@ -13,8 +13,12 @@ Apphelpers.signature = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9";
 
 Apphelpers.url.create = `${baseUrl}/create`;
 Apphelpers.url.verify_otp = `${baseUrl}/verify_otp`;
+Apphelpers.url.account_reset_otp = `${baseUrl}/account_reset_otp`;
+Apphelpers.url.update_password = `${baseUrl}/update_password`;
+Apphelpers.url.reset_password = `${baseUrl}/reset_password`;
 Apphelpers.url.signin = `${baseUrl}/signin`;
 Apphelpers.url.set_pin = `${baseUrl}/set_pin`;
+Apphelpers.url.verify_bvn = `${baseUrl}/verify_bvn`;
 Apphelpers.url.profile_progress = `${baseUrl}/profile_progress`;
 Apphelpers.url.create_profile = `${baseUrl}/create_profile`;
 Apphelpers.url.director_profile = `${baseUrl}/director_profile`;

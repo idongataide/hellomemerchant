@@ -301,8 +301,8 @@ Myfunctions.DirectorProfile = (formData, navigate, setLoading) => {
 
 
 Myfunctions.ProfileProgress = async (navigate, setProfileProgress) => {
-   let token = sessionStorage.getItem('token');
 
+   let token = sessionStorage.getItem('token');
    if (!token || token === '') {
        return Apphelpers.flashMessage("error", "Invalid request");
    }
@@ -323,7 +323,6 @@ Myfunctions.ProfileProgress = async (navigate, setProfileProgress) => {
        if (res.status === '00') {
            const profileProgress = res;
            setProfileProgress(profileProgress);
-           console.log(res)
            if (res.business_profile !== '1') {
                navigate('/create-profile');
            } else if (res.director_profile !== 1) {
@@ -334,7 +333,7 @@ Myfunctions.ProfileProgress = async (navigate, setProfileProgress) => {
                navigate('/index');
            }
        } else {
-           Apphelpers.flashMessage("error", res.message);
+        //    Apphelpers.flashMessage("error", res.message);
        }
    });
 };
@@ -375,6 +374,7 @@ Myfunctions.uploadCAC = async (file, navigate, setProfileProgress) => {
  
      Apphelpers.sendRequest(sendData, (res) => {
        if (res.status === '00') {
+         Myfunctions.ProfileProgress(navigate, setProfileProgress)
          return Apphelpers.flashMessage("success", res.message);
        } else {
          return Apphelpers.flashMessage("error", res.message);
@@ -418,7 +418,7 @@ Myfunctions.uploadMermat  = async (file, navigate, setProfileProgress) => {
  
      Apphelpers.sendRequest(sendData, (res) => {
        if (res.status === '00') {
-         // Myfunctions.ProfileProgress(navigate, setProfileProgress)
+         Myfunctions.ProfileProgress(navigate, setProfileProgress)
          return Apphelpers.flashMessage("success", res.message);
        } else {
          return Apphelpers.flashMessage("error", res.message);
@@ -428,7 +428,7 @@ Myfunctions.uploadMermat  = async (file, navigate, setProfileProgress) => {
 };
 
 
-Myfunctions.IDcard  = async (file) => {
+Myfunctions.IDcard  = async (file, navigate, setProfileProgress) => {
 
 
    return new Promise((resolve, reject) => {
@@ -462,6 +462,7 @@ Myfunctions.IDcard  = async (file) => {
  
      Apphelpers.sendRequest(sendData, (res) => {
        if (res.status === '00') {
+         Myfunctions.ProfileProgress(navigate, setProfileProgress)
          return Apphelpers.flashMessage("success", res.message);
        } else {
          return Apphelpers.flashMessage("error", res.message);
@@ -608,9 +609,8 @@ Myfunctions.ForgotPassword = async (e, navigate, setLoading) => {
    e.preventDefault()
    return new Promise((resolve, reject) => {
     
-   let {email, password} = e.target.elements;
+   let {email} = e.target.elements;
    email = email && email.value.trim()
-   password = password && password.value.trim()
  
  
  
@@ -618,19 +618,14 @@ Myfunctions.ForgotPassword = async (e, navigate, setLoading) => {
       return Apphelpers.flashMessage("error", "Kindly enter email")
    }
  
-   if (!password || password === '') {
-      return Apphelpers.flashMessage("error", "Kindly enter password")
-   }
- 
  
    let bodyData = JSON.stringify({
        email: email,
-       password: password
    });
  
  
     let sendData = {
-       url: Apphelpers.url.signin,
+       url: Apphelpers.url.account_reset_otp,
        method: 'POST',
        headers: {
           "Accept": "application/json",
@@ -641,9 +636,10 @@ Myfunctions.ForgotPassword = async (e, navigate, setLoading) => {
     }
     setLoading(true);
     Apphelpers.sendRequest(sendData, res => {
-       if (res.status === '00') {
+       if (res.status === true) {
            setLoading(false);
-           navigate('/index')
+           localStorage.setItem('password_email', email)
+           navigate('/verify')
            return Apphelpers.flashMessage("success", res.message)
        } else {
           return Apphelpers.flashMessage("error", res.message)
@@ -652,7 +648,111 @@ Myfunctions.ForgotPassword = async (e, navigate, setLoading) => {
  
  });
 };
+
+
+Myfunctions.UpdatePassword = async (e, navigate, setLoading) => {
+
+   e.preventDefault()
+
+
+   let code = localStorage.getItem('pass_token')
+   let new_password = document.querySelector(".change_password").value
+   let confirm_password = document.querySelector(".confirm_change_password").value
+
+   const regexUpercase = /(?=.*?[A-Z])/;
+   const regexCharacter = /(?=.*?[0-9])/;
+
+
+   if (!new_password || new_password === '') {
+      return Apphelpers.flashMessage("error", "Kindly insert password")
+   }
+   if (!regexCharacter.test(new_password)) {
+      return Apphelpers.flashMessage("error", "Password Should contain atleast one character")
+   }
+   if (!regexUpercase.test(new_password)) {
+      return Apphelpers.flashMessage("error", "Password Should contain atleast a capital letter")
+   }
+   if (new_password.length < 8) {
+      return Apphelpers.flashMessage("error", "New Password Length too short")
+   }
+   if (!confirm_password || confirm_password === '') {
+      return Apphelpers.flashMessage("error", "Kindly confirm your password")
+   }
+   if (confirm_password != new_password) {
+      return Apphelpers.flashMessage("error", "Confirm Password doesn't match")
+   }
+
+
+   let bodyData = JSON.stringify({
+       token: code,
+       password: new_password,
+   });
+
+   console.log(bodyData,'sd')
+
+   let sendData = {
+       url: Apphelpers.url.reset_password,
+       method: 'POST',
+       headers: {
+           "Accept": "application/json",
+           "Content-Type": "application/json",
+           "h-auth-signature": Apphelpers.signature,
+       },
+       body: bodyData,
+   };
+   setLoading(true);
+
+   Apphelpers.sendRequest(sendData, (res) => {
+       setLoading(false);
+       if (res.status === '00') {
+           navigate('/signin')
+       } else {
+           return Apphelpers.flashMessage("error", res.message);
+       }
+   });
+};
   
+
+Myfunctions.checkPassword = (e, setPasswordCondition) => {
+   e.preventDefault()
+
+   let password = document.querySelector(".setnewpassword").value
+
+   const regexUpercase = /(?=.*?[A-Z])/;
+   const regexCharacter = /(?=.*?[0-9])/;
+
+   if (!regexCharacter.test(password)) {
+      document.getElementById("character").checked = false
+      const character = false
+      setPasswordCondition('character', character)
+   } else {
+      document.getElementById("character").checked = true
+      const character = true
+      setPasswordCondition('character', character)
+   }
+
+   if (!regexUpercase.test(password)) {
+      document.getElementById("uppercase").uppercase = false
+      const uppercase = false
+      setPasswordCondition('uppercase', uppercase)
+   } else {
+      document.getElementById("uppercase").checked = true
+      const uppercase = true
+      setPasswordCondition('uppercase', uppercase)
+   }
+
+   if (password.length < 8) {
+      document.getElementById("length").checked = false
+      const length = false
+      setPasswordCondition('length', length)
+   } else {
+      document.getElementById("length").checked = true
+      const length = true
+      setPasswordCondition('length', length)
+   }
+}
+
+
 Myfunctions.handleOTP = async (e, navigate, setLoading) => {
 
    e.preventDefault()
@@ -704,7 +804,7 @@ Myfunctions.handleOTP = async (e, navigate, setLoading) => {
  };
  
 
- Myfunctions.SetPin = async (e, navigate, setLoading) => {
+ Myfunctions.SetPin = async (e, setLoading) => {
 
    e.preventDefault()
    return new Promise((resolve, reject) => {
@@ -744,6 +844,7 @@ Myfunctions.handleOTP = async (e, navigate, setLoading) => {
     Apphelpers.sendRequest(sendData, res => {
       setLoading(false);
        if (res.status === '00') {
+           document.querySelector('#closePin').click()
            return Apphelpers.flashMessage("success", res.message)
        } else {
           return Apphelpers.flashMessage("error", res.message)
@@ -752,6 +853,58 @@ Myfunctions.handleOTP = async (e, navigate, setLoading) => {
  
  });
  };
+
+ Myfunctions.BVN = async (e, setLoading) => {
+
+    e.preventDefault()
+    return new Promise((resolve, reject) => {
+
+    let { bvn } = e.target.elements;
+    bvn = bvn && bvn.value.trim();
+  
+    let token = sessionStorage.getItem('token')
+  
+  
+    if (!token || token === '') {
+       return Apphelpers.flashMessage("error", "Invalid request")
+    }
+  
+    if (!bvn || bvn === '') {
+       return Apphelpers.flashMessage("error", "Kindly Input BVN")
+    }
+  
+  
+    let bodyData = JSON.stringify({
+       token: token,
+       bvn: bvn,
+    });
+  
+ 
+     let sendData = {
+        url: Apphelpers.url.verify_bvn,
+        method: 'POST',
+        headers: {
+           "Accept": "application/json",
+           "Content-Type": "application/json",
+           "h-auth-signature": Apphelpers.signature,
+           "user-auth": token
+       },
+        body: bodyData
+     }
+     setLoading(true);
+ 
+     Apphelpers.sendRequest(sendData, res => {
+       setLoading(false);
+        if (res.status === '00') {
+            document.querySelector('#closeBVN').click()
+            return Apphelpers.flashMessage("success", res.message)
+        } else {
+           return Apphelpers.flashMessage("error", res.message)
+        }
+    });
+  
+  });
+  };
   
 
 

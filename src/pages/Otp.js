@@ -47,7 +47,7 @@ let email = localStorage.getItem('email')
                                                 <button type="button"  onClick={(e)=>{Myfunctions.handleOTP(e, navigate, setOtp)}} class="btn btn-primary btn-block">Submit</button>
                                             </div>
                                          </form>
-                                        <Link to="/signin"><p className='text-secondary fs-18 font-w500'>Proceed to sigin</p></Link>
+                                        <Link to="/signin"><p className='text-secondary fs-16 font-w500'>Proceed to sigin</p></Link>
                                     </div>
                                 </div>
                             </div>

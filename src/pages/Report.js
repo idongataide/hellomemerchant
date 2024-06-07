@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import TopDashboard from '../Components/TopDashboard'
 import SideDashboard from '../Components/SideDashboard'
+import { Link } from 'react-router-dom';
 
 
 function Report() {
@@ -37,25 +38,25 @@ function Report() {
                             <div class="custom-tab-1">
                                 <ul class="nav nav-tabs">
                                     <li class="nav-item">
-                                        <a class="nav-link ps-0 active" data-bs-toggle="tab" href="#Transactions"> Transactions</a>
+                                        <Link class="nav-link ps-0 active" data-bs-toggle="tab" href="#Transactions"> Transactions</Link>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" data-bs-toggle="tab" href="#Wallet"> Wallet</a>
+                                        <Link class="nav-link" data-bs-toggle="tab" href="#Wallet"> Wallet</Link>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" data-bs-toggle="tab" href="#Session">Session calls</a>
+                                        <Link class="nav-link" data-bs-toggle="tab" href="#Session">Session calls</Link>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" data-bs-toggle="tab" href="#Activity">Accounts Activity</a>
+                                        <Link class="nav-link" data-bs-toggle="tab" href="#Activity">Accounts Activity</Link>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" data-bs-toggle="tab" href="#Webhooks">Webhooks</a>
+                                        <Link class="nav-link" data-bs-toggle="tab" href="#Webhooks">Webhooks</Link>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" data-bs-toggle="tab" href="#Dispute">Dispute</a>
+                                        <Link class="nav-link" data-bs-toggle="tab" href="#Dispute">Dispute</Link>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" data-bs-toggle="tab" href="#Exports">Exports</a>
+                                        <Link class="nav-link" data-bs-toggle="tab" href="#Exports">Exports</Link>
                                     </li>
                                 </ul>
                                 <div class="tab-content">
@@ -103,9 +104,9 @@ function Report() {
                                                 <input type="text" className="form-control h-60" placeholder="Search by Account No. Phone,"/>
                                                 <div className="input-group-append">
                                                     <span className="input-group-text h-60">
-                                                    <a href="#">
+                                                    <Link href="#">
                                                         <i className="flaticon-381-search-2"></i>
-                                                    </a>
+                                                    </Link>
                                                     </span>
                                                 </div>
                                                 </div>
@@ -287,9 +288,9 @@ function Report() {
                                                         <input type="text" class="form-control h-60" placeholder="Search"/>
                                                         <div class="input-group-append">
                                                             <span class="input-group-text h-60">
-                                                                <a href="#">
+                                                                <Link href="#">
                                                                     <i class="flaticon-381-search-2"></i>
-                                                                </a>
+                                                                </Link>
                                                             </span>
                                                         </div>
                                                     </div>
@@ -353,9 +354,9 @@ function Report() {
                                                             <input type="text" class="form-control h-60" placeholder="Search by Account No. Phone,"/>
                                                             <div class="input-group-append">
                                                                 <span class="input-group-text h-60">
-                                                                    <a href="#">
+                                                                    <Link href="#">
                                                                         <i class="flaticon-381-search-2"></i>
-                                                                    </a>
+                                                                    </Link>
                                                                 </span>
                                                             </div>
                                                         </div>
