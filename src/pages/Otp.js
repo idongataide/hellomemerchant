@@ -44,7 +44,7 @@ let email = localStorage.getItem('email')
                                                 </div>
                                             </div>
                                             <div class="text-center mt-4 pb-3">
-                                                <button type="button"  onClick={(e)=>{Myfunctions.handleOTP(e, navigate, setOtp)}} class="btn btn-primary btn-block">Submit</button>
+                                                <button type="button"  onClick={(e)=>{Myfunctions.handleOTP(e, navigate, setLoading)}} disabled={loading} class="btn btn-primary btn-block">{loading && <span className='spinner-border'></span>}{loading ? 'Loading in...' : 'Submit'}</button>
                                             </div>
                                          </form>
                                         <Link to="/signin"><p className='text-secondary fs-16 font-w500'>Proceed to sigin</p></Link>

@@ -21,7 +21,7 @@ function ForgotPassword() {
                                 <div className="col-xl-12">
                                     <div className="auth-form">
                                          <div className="text-center mb-5">
-                                            <img className='logo-img' src={Images.logo} alt=""/>
+                                           <Link to="/"> <img className='logo-img' src={Images.logo} alt=""/></Link> 
                                         </div>
                                         <h3 className="text-center mb-4 text-secondary">FORGOT PASSWORD</h3>
                                         <p className='sub-text text-center fs-14'>No worries! Enter your email address below and we will send you instructions on how to reset your password.</p>

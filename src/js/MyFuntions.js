@@ -148,50 +148,48 @@ Myfunctions.CreateProfile = async (formData, navigate, setLoading) => {
       return Apphelpers.flashMessage("error", "Invalid token");
    }
 
-   if (!businessType) {
+   if (!businessType || businessType === '') {
        return Apphelpers.flashMessage("error", "Kindly select Business Type");
    }
 
-   if (!industry) {
+   if (!industry || industry === '') {
        return Apphelpers.flashMessage("error", "Kindly select Business Industry");
    }
 
-   if (!incorporation) {
+   if (!incorporation || incorporation === '') {
        return Apphelpers.flashMessage("error", "Kindly enter Business Incorporation Date");
    }
 
-   if (!RcNumeber) {
+   if (!RcNumeber || RcNumeber === '') {
        return Apphelpers.flashMessage("error", "Kindly enter Rc Number");
    }
 
-   if (!email) {
+   if (!email || email === '') {
        return Apphelpers.flashMessage("error", "Kindly enter Business Email");
    }
+   if (!phone || phone === '') {
+    return Apphelpers.flashMessage("error", "Kindly enter phone number");
+   }
 
-   if (!Website) {
+   if (!Website || Website === '') {
        return Apphelpers.flashMessage("error", "Kindly enter Website");
    }
 
-   if (!business_address) {
-       return Apphelpers.flashMessage("error", "Kindly enter business address");
-   }
-
-   if (!phone) {
-       return Apphelpers.flashMessage("error", "Kindly enter phone number");
-   }
-
-   if (!country) {
+   if (!country || country === '') {
        return Apphelpers.flashMessage("error", "Kindly select a Country");
    }
 
-   if (!state) {
+   if (!state || state === '') {
        return Apphelpers.flashMessage("error", "Kindly select a State");
    }
 
-   if (!city) {
+   if (!city || city === '') {
        return Apphelpers.flashMessage("error", "Kindly enter a City");
    }
 
+   if (!business_address || business_address === '') {
+    return Apphelpers.flashMessage("error", "Kindly enter business address");
+  }
    
    const bodyData = JSON.stringify({
        country: country,
@@ -235,7 +233,6 @@ Myfunctions.CreateProfile = async (formData, navigate, setLoading) => {
 
 
 Myfunctions.DirectorProfile = (formData, navigate, setLoading) => {
-   setLoading(true);
 
    const token = sessionStorage.getItem('token');
 
@@ -254,7 +251,7 @@ Myfunctions.DirectorProfile = (formData, navigate, setLoading) => {
        return Apphelpers.flashMessage("error", "Kindly select a Country");
    }
    if (!state || state === '') {
-       return Apphelpers.flashMessage("error", "Kindly select a Country");
+       return Apphelpers.flashMessage("error", "Kindly select a State");
    }
    if (!city || city === '') {
        return Apphelpers.flashMessage("error", "Kindly select a city");
@@ -286,6 +283,9 @@ Myfunctions.DirectorProfile = (formData, navigate, setLoading) => {
        },
        body: bodyData
    };
+
+   setLoading(true);
+
 
    Apphelpers.sendRequest(sendData, res => {
        setLoading(false);
@@ -327,7 +327,7 @@ Myfunctions.ProfileProgress = async (navigate, setProfileProgress) => {
                navigate('/create-profile');
            } else if (res.director_profile !== 1) {
                navigate('/director-profile');
-           } else if (res.cac !== '1' || res.director_id !== '1' || res.mermat !== '1' || res.pin_setup !== '1' || res.pof !== '1') {
+           } else if (res.cac !== '0' || res.director_id !== '1' || res.mermat !== '1' || res.pin_setup !== '1' || res.pof !== '1') {
                navigate('/account-setup');
            } else {
                navigate('/index');
@@ -891,6 +891,7 @@ Myfunctions.handleOTP = async (e, navigate, setLoading) => {
        },
         body: bodyData
      }
+     
      setLoading(true);
  
      Apphelpers.sendRequest(sendData, res => {
@@ -904,9 +905,87 @@ Myfunctions.handleOTP = async (e, navigate, setLoading) => {
     });
   
   });
-  };
+};
+
+Myfunctions.SecurityQuestions = async (setSecurityQuestions) => {
+
+    let token = sessionStorage.getItem('token');
+    if (!token || token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+
+    let sendData = {
+        url: Apphelpers.url.fetch_questions,
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token,
+        },
+        body: JSON.stringify({}),
+    };
+
+    Apphelpers.sendRequest(sendData, (res) => {
+        if (res.status === true) {
+            const GetQuestions = res;
+            setSecurityQuestions(GetQuestions);
+        } else {
+            // Apphelpers.flashMessage("error", res.message);
+        }
+    });
+   
+ };
   
 
+ Myfunctions.SetupQuestion = async (formData) => {
+    const { questions } = formData;
+
+    let token = sessionStorage.getItem('token');
+
+    if (!token || token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+
+    const selectedQuestions = questions.filter(q => q.question_id && q.question && q.answer);
+    
+    if (selectedQuestions.length < 2) {
+        return Apphelpers.flashMessage("error", "Kindly select at least 2 questions and provide answers");
+    }
+
+    let allSuccess = true;
+
+    for (const question of selectedQuestions) {
+        let bodyData = JSON.stringify({
+            question_id: question.question_id,
+            question: question.question,
+            answer: question.answer,
+        });
+
+        let sendData = {
+            url: Apphelpers.url.set_security_question,
+            method: 'POST',
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "h-auth-signature": Apphelpers.signature,
+                "user-auth": token,
+            },
+            body: bodyData,
+        };
+
+        await Apphelpers.sendRequest(sendData, (res) => {
+            if (!res.status) {
+                allSuccess = false;
+                Apphelpers.flashMessage("error", res.message);
+            }
+        });
+    }
+
+    if (allSuccess) {
+        Apphelpers.flashMessage("success", "Security questions have been successfully set.");
+    }
+};
 
 
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import Images from './Images'
-import { useNavigate} from 'react-router-dom'
+import { Link, useNavigate} from 'react-router-dom'
 import Myfunctions from '../js/MyFuntions'
 import { Select } from 'antd';
 import { Country, State } from 'country-state-city';
@@ -52,7 +52,7 @@ function DirectorProfile() {
                                     <div class="col-xl-12">
                                         <div class="auth-form">
                                             <div class="text-center mb-3">
-                                                <img className='logo-img' src={Images.logo} alt=""/>
+                                                <Link to="/"> <img className='logo-img' src={Images.logo} alt=""/></Link> 
                                             </div>
                                             <h3 class="text-center mb-3">Create Profile</h3>
                                             <form onSubmit={handleSubmit} action="#">
@@ -108,7 +108,7 @@ function DirectorProfile() {
                                                     </div>
                                                     <div className='mb-3 col-md-6'>
                                                         <div className="form-group">
-                                                            <label className="mb-1"><strong>State</strong></label>
+                                                            <label className="mb-1"><strong>State/County</strong></label>
                                                             <Select
                                                                 showSearch
                                                                 className='form-control bg-white p-0'

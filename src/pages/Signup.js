@@ -25,7 +25,7 @@ function Signup() {
                                     <div class="col-xl-12 ">
                                         <div class="auth-form">
                                             <div class="text-center mb-3">
-                                                <img className='logo-img' src={Images.logo} alt=""/>
+                                                    <Link to="/"> <img className='logo-img' src={Images.logo} alt=""/></Link> 
                                             </div>
                                             <h4 class="text-center mb-5">Create your HelloMe Money Account</h4>
                                             <form onSubmit={(e)=>{Myfunctions.create(e, navigate, setLoading )}} action="#">

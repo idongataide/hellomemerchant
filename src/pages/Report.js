@@ -38,25 +38,25 @@ function Report() {
                             <div class="custom-tab-1">
                                 <ul class="nav nav-tabs">
                                     <li class="nav-item">
-                                        <Link class="nav-link ps-0 active" data-bs-toggle="tab" href="#Transactions"> Transactions</Link>
+                                        <Link class="nav-link ps-0 active" data-bs-toggle="tab" to="#Transactions"> Transactions</Link>
                                     </li>
                                     <li class="nav-item">
-                                        <Link class="nav-link" data-bs-toggle="tab" href="#Wallet"> Wallet</Link>
+                                        <Link class="nav-link" data-bs-toggle="tab" to="#Wallet"> Wallet</Link>
                                     </li>
                                     <li class="nav-item">
-                                        <Link class="nav-link" data-bs-toggle="tab" href="#Session">Session calls</Link>
+                                        <Link class="nav-link" data-bs-toggle="tab" to="#Session">Session calls</Link>
                                     </li>
                                     <li class="nav-item">
-                                        <Link class="nav-link" data-bs-toggle="tab" href="#Activity">Accounts Activity</Link>
+                                        <Link class="nav-link" data-bs-toggle="tab" to="#Activity">Accounts Activity</Link>
                                     </li>
                                     <li class="nav-item">
-                                        <Link class="nav-link" data-bs-toggle="tab" href="#Webhooks">Webhooks</Link>
+                                        <Link class="nav-link" data-bs-toggle="tab" to="#Webhooks">Webhooks</Link>
                                     </li>
                                     <li class="nav-item">
-                                        <Link class="nav-link" data-bs-toggle="tab" href="#Dispute">Dispute</Link>
+                                        <Link class="nav-link" data-bs-toggle="tab" to="#Dispute">Dispute</Link>
                                     </li>
                                     <li class="nav-item">
-                                        <Link class="nav-link" data-bs-toggle="tab" href="#Exports">Exports</Link>
+                                        <Link class="nav-link" data-bs-toggle="tab" to="#Exports">Exports</Link>
                                     </li>
                                 </ul>
                                 <div class="tab-content">

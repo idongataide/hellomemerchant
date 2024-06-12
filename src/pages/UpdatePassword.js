@@ -39,7 +39,7 @@ function UpdatePassword() {
                                 <div className="col-xl-12">
                                     <div className="auth-form">
                                          <div className="text-center mb-3">
-                                            <img className='logo-img' src={Images.logo} alt=""/>
+                                             <Link to="/"> <img className='logo-img' src={Images.logo} alt=""/></Link> 
                                         </div>
                                         <h3 className="text-center mb-4 text-secondary">SET NEW PASSWORD</h3>
                                         <form onSubmit={(e)=>{Myfunctions.UpdatePassword(e, navigate, setLoading )}}>
@@ -81,7 +81,7 @@ function UpdatePassword() {
                                                 </button>
                                             </div>
                                             </form>
-                                        <Link to="/signin"><p className='text-secondary text-center fs-16 font-w500'>Proceed to signin</p></Link>
+                                           <Link to="/signin"><p className='text-secondary text-center fs-16 font-w500'>Proceed to signin</p></Link>
                                     </div>
                                 </div>
                             </div>

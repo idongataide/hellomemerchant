@@ -3,25 +3,23 @@ import Images from './Images';
 import { Link, useNavigate } from 'react-router-dom';
 import Myfunctions from '../js/MyFuntions';
 import OtpInput from 'react-otp-input';
-import useStore, { useStoreSelector } from '../js/Store/useStore'; 
+import { Select } from 'antd';
+import { Country, State } from 'country-state-city';
+import useStore, { useStoreSelector } from '../js/Store/useStore';
 
-
+const { Option } = Select;
 
 function AccountSetup() {
-
-
     const navigate = useNavigate();
-
-    const { setProfileProgress } = useStoreSelector(["setProfileProgress"]);
-
-    const { userData, profileProgress } = useStoreSelector(["userData", "profileProgress"]);
+    const { setProfileProgress, setSecurityQuestions } = useStoreSelector(["setProfileProgress", "setSecurityQuestions"]);
+    const { userData, profileProgress, securityQuestions } = useStoreSelector(["userData", "profileProgress", "securityQuestions"]);
 
 
     useEffect(() => {
         Myfunctions.ProfileProgress(navigate, setProfileProgress);
-    }, [navigate, setProfileProgress]);
- 
-     
+        Myfunctions.SecurityQuestions(setSecurityQuestions);
+    }, [navigate, setProfileProgress, setSecurityQuestions]);
+
     const [pin, setPin] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -51,7 +49,6 @@ function AccountSetup() {
         }
     };
 
-
     const filePOFRef = useRef(null);
 
     const POFUpload = () => {
@@ -65,7 +62,6 @@ function AccountSetup() {
         }
     };
 
-    
     const fileIDRef = useRef(null);
 
     const IDUpload = () => {
@@ -79,11 +75,36 @@ function AccountSetup() {
         }
     };
 
+    const [questions, setQuestions] = useState([
+        { question_id: null, question: '', answer: '' },
+        { question_id: null, question: '', answer: '' },
+        { question_id: null, question: '', answer: '' },
+    ]);
 
+    const handleSecurity = (e) => {
+        e.preventDefault();
+        const formData = {
+            questions: questions,
+        };
+
+        Myfunctions.SetupQuestion(formData, setLoading);
+    };
+
+    const handleQuestionChange = (index, value, option) => {
+        const newQuestions = [...questions];
+        newQuestions[index] = { ...newQuestions[index], question_id: value, question: option['data-question'] };
+        setQuestions(newQuestions);
+    };
+
+    const handleAnswerChange = (index, value) => {
+        const newQuestions = [...questions];
+        newQuestions[index] = { ...newQuestions[index], answer: value };
+        setQuestions(newQuestions);
+    };
 
     return (
         <div>
-            <div className="LoginBody authincation h-100">
+            <div className="LoginBody authincation h-100- py-5">
                 <div className="container h-100">
                     <div className="row justify-content-center h-100 align-items-center">
                         <div className="col-lg-6 col-md-12">
@@ -92,7 +113,7 @@ function AccountSetup() {
                                     <div className="col-xl-12">
                                         <div className="auth-form">
                                             <div className="text-center mb-3">
-                                                <img className='logo-img w-40' src={Images.logo} alt="" />
+                                                 <Link to="/">  <img className='logo-img w-40' src={Images.logo} alt="" /></Link> 
                                             </div>
                                             <h4 className="text-secondary">Account Setup</h4>
                                             <p className='sub-text'>Just few more steps to get you all setup </p>
@@ -151,26 +172,23 @@ function AccountSetup() {
                                                     <i className='fa fa-user fs-20 me-3' />
                                                     <div className="media-body">
                                                         <h6>BVN</h6>
-                                                        <span>Verify your BVN</span>
+                                                        <span>Verify your bvn</span>
                                                     </div>
                                                     {profileProgress.bvn_update == '1' ? <i className='fas fa-check-circle text-green' /> : <i className='fas fa-angle-right' />}
                                                 </div>
                                             </div>
-                                            <div className='setup-items mb-0' data-bs-toggle="modal" data-bs-target="#SetPin">
+                                            <div className='setup-items mb-2' data-bs-toggle="modal" data-bs-target="#SecurityQuestions">
                                                 <div className="media style-1">
-                                                    <i className='fa fa-shield-alt fs-20 me-3' />
+                                                    <i className='fa fa-key fs-20 me-3' />
                                                     <div className="media-body">
-                                                        <h6>PIN</h6>
-                                                        <span>Transaction pin setup</span>
+                                                        <h6>Security Questions</h6>
+                                                        <span>Setup security questions</span>
                                                     </div>
                                                     {profileProgress.pin_setup == '1' ? <i className='fas fa-check-circle text-green' /> : <i className='fas fa-angle-right' />}
                                                 </div>
                                             </div>
 
-                                            {/* <Link to="/index"><p className='text-secondary text-center mt-3 mb-0 fs-16 font-w500'>Proceed to dashboard</p></Link> */}
-
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
@@ -183,7 +201,7 @@ function AccountSetup() {
                 <div className="modal-dialog modal-dialog-centered" role="document">
                     <div className="modal-content">
                         <div className="modal-header">
-                            <button type="button" id='closePin' className="btn-close" data-bs-dismiss="modal"></button>
+                            <button type="button" id="closePin" className="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div className="modal-body">
                             <h3 className="text-center mb-2 text-secondary">Set Pin</h3>
@@ -203,7 +221,7 @@ function AccountSetup() {
                                     </div>
                                 </div>
                                 <div className="text-center mt-4 pb-3">
-                                    <button type="button" onClick={(e) => { Myfunctions.SetPin(e, navigate, setLoading) }}  disabled={loading} className="btn btn-primary btn-block">{loading && <span className='spinner-border'></span>}{loading ? 'Signing in...' : 'Submit'}</button>
+                                    <button type="button" onClick={(e) => { Myfunctions.SetPin(e, setLoading) }}  disabled={loading} className="btn btn-primary btn-block">{loading && <span className='spinner-border'></span>}{loading ? 'Processing...' : 'Submit'}</button>
                                 </div>
                             </form>
                         </div>
@@ -225,7 +243,85 @@ function AccountSetup() {
                                     <input type="text" name='bvn' className="form-control" placeholder='Enter your BVN' />
                                 </div>
                                 <div className="text-center">
-                                    <button type="submit" disabled={loading} className="btn btn-primary btn-block">{loading && <span className='spinner-border'></span>}{loading ? 'Signing in...' : 'Submit'}</button>
+                                    <button type="submit" disabled={loading} className="btn btn-primary btn-block">{loading && <span className='spinner-border'></span>}{loading ? 'Processing...' : 'Submit'}</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="modal fade" id="SecurityQuestions">
+                <div className="modal-dialog modal-dialog-centered" role="document">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <button type="button" id="closeSecurityQuestions" className="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div className="modal-body">
+                            <h3 className="text-center text-secondary">Set Security Question</h3>
+                            <p className='mb-4 text-red text-center'>Kindly answer atleast 2 questions</p>
+                            <form action='#' onSubmit={handleSecurity}>
+                                <div className='mb-3 col-md-12'>
+                                    <div className="form-group mb-4">
+                                        <label className="mb-2"><strong>Question 1</strong></label>
+                                        <Select 
+                                            className="w-100 form-control bg-white- p-0"
+                                            placeholder="Select a security question"
+                                            onChange={(value, option) => handleQuestionChange(0, value, option)}
+                                            dropdownStyle={{ zIndex: 2000 }}
+                                            showSearch
+                                            >
+                                            {securityQuestions?.questions?.data && Array.isArray(securityQuestions.questions.data) ?
+                                                securityQuestions.questions.data.map((e, i) =>
+                                                    <Option key={i} value={e.question_id} data-question={e.question}>{e.question}</Option>
+                                                )
+                                                : <Option>Loading ...</Option>
+                                            }
+                                        </Select>
+                                        <input type="text" style={{height:'50px'}} name='answer_1' placeholder='Kindly provide an answer' className='form-control mt-3' onChange={(e) => handleAnswerChange(0, e.target.value)} />
+
+                                    </div>
+                                    <div className="form-group mb-4">
+                                        <label className="mb-2"><strong>Question 2</strong></label>
+                                        <Select
+                                            showSearch
+                                            className="w-100 form-control bg-white- p-0"
+                                            placeholder="Select a security question"
+                                            onChange={(value, option) => handleQuestionChange(1, value, option)}
+                                            dropdownStyle={{ zIndex: 2000 }}
+                                            >
+                                            {securityQuestions?.questions?.data && Array.isArray(securityQuestions.questions.data) ?
+                                                securityQuestions.questions.data.map((e, i) =>
+                                                    <Option key={i} value={e.question_id} data-question={e.question}>{e.question}</Option>
+                                                )
+                                                : <Option>Loading ...</Option>
+                                            }
+                                        </Select>
+                                        <input type="text" style={{height:'50px'}} name='answer_2' placeholder='Kindly provide an answer' className='form-control mt-3' onChange={(e) => handleAnswerChange(1, e.target.value)} />
+
+                                    </div>
+                                    <div className="form-group mb-4">
+                                        <label className="mb-2"><strong>Question 3</strong></label>
+                                        <Select
+                                            dropdownStyle={{ zIndex: 2000 }}
+                                            showSearch
+                                            className="w-100 form-control bg-white- p-0"
+                                            placeholder="Select a security question"
+                                            onChange={(value, option) => handleQuestionChange(2, value, option)}
+                                            >
+                                            {securityQuestions?.questions?.data && Array.isArray(securityQuestions.questions.data) ?
+                                                securityQuestions.questions.data.map((e, i) =>
+                                                    <Option key={i} value={e.question_id} data-question={e.question}>{e.question}</Option>
+                                                )
+                                                : <Option>Loading ...</Option>
+                                            }
+                                        </Select>
+                                        <input type="text" style={{height:'50px'}} name='answer_3' placeholder='Kindly provide an answer' className='form-control mt-3' onChange={(e) => handleAnswerChange(2, e.target.value)} />
+
+                                    </div>
+                                </div>
+                                <div className="text-center mt-4 mb-5">
+                                    <button type="submit" disabled={loading} className="btn btn-primary btn-block">{loading && <span className='spinner-border'></span>}{loading ? 'Processing...' : 'Submit'}</button>
                                 </div>
                             </form>
                         </div>

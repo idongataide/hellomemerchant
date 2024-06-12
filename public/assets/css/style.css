@@ -23231,6 +23231,11 @@ table.dataTable.display tbody td {
   text-security: square;
 }
 
+.otp-input{
+  -webkit-text-security: square;
+  text-security: square;
+}
+
 /* OTPScreen Ends */
 
 .spinner-border {
@@ -23245,6 +23250,7 @@ table.dataTable.display tbody td {
   box-shadow: 0rem 0.3125rem 0.3125rem 0rem rgba(82, 63, 105, 0.05);
   border: 0.5px solid #77777759;
   border-radius: 20px;
+  cursor: pointer;
 }  
 
 .setup-items h6{
@@ -23253,6 +23259,12 @@ table.dataTable.display tbody td {
   font-family: "ClashGrotesk-Variable";
 }
 
+
 :where(.css-dev-only-do-not-override-3rel02).ant-select-outlined:not(.ant-select-customize-input) .ant-select-selector{
   border:none !important
+}
+
+.notice{
+  font-size: 12px;
+  margin-top: 15px;
 }

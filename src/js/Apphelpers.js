@@ -27,6 +27,8 @@ Apphelpers.url.upload_mermat = `${baseUrl}/upload_mermat`;
 Apphelpers.url.upload_pof = `${baseUrl}/upload_pof`;
 Apphelpers.url.upload_pof = `${baseUrl}/upload_pof`;
 Apphelpers.url.upload_id = `${baseUrl}/upload_id`;
+Apphelpers.url.fetch_questions = `${baseUrl}/fetch_questions`;
+Apphelpers.url.set_security_question = `${baseUrl}/set_security_question`;
 
 
 

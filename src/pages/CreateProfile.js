@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Images from './Images';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Myfunctions from '../js/MyFuntions';
 import { Select } from 'antd';
 import { Country, State } from 'country-state-city';
@@ -62,7 +62,7 @@ function CreateProfile() {
                                     <div className="col-xl-12">
                                         <div className="auth-form">
                                             <div className="text-center mb-4">
-                                                <img className='logo-img' src={Images.logo} alt="" />
+                                                  <Link to="/"> <img className='logo-img' src={Images.logo} alt=""/></Link> 
                                             </div>
                                             <h3 className="text-center mb-4">Create Business Profile</h3>
                                             <form onSubmit={handleSubmit} action="#">
@@ -153,7 +153,7 @@ function CreateProfile() {
                                                     </div>
                                                     <div className='mb-3 col-md-6'>
                                                         <div className="form-group">
-                                                            <label className="mb-1"><strong>State</strong></label>
+                                                            <label className="mb-1"><strong>State/County</strong></label>
                                                             <Select
                                                                 showSearch
                                                                 className='form-control bg-white p-0'
