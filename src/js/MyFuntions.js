@@ -231,157 +231,156 @@ Myfunctions.CreateProfile = async (formData, navigate, setLoading) => {
    });
 };
 
-
 Myfunctions.DirectorProfile = (formData, navigate, setLoading) => {
+    const token = sessionStorage.getItem('token');
+    const { phone, phonecode, dob, city, address, gender, country, state } = formData;
+ 
+    const calculateAge = (birthdate) => {
+        const today = new Date();
+        const birthDate = new Date(birthdate);
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDifference = today.getMonth() - birthDate.getMonth();
+        if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age;
+    };
+ 
+    if (!gender || gender === '') {
+        return Apphelpers.flashMessage("error", "Kindly select gender");
+    }
+    if (!phone || phone === '') {
+        return Apphelpers.flashMessage("error", "Kindly enter phone number");
+    }
+    if (!dob || dob === '') {
+        return Apphelpers.flashMessage("error", "Kindly enter date of birth");
+    }
+    if (calculateAge(dob) < 18) {
+        return Apphelpers.flashMessage("error", "You must be at least 18 years old");
+    }
+    if (!country || country === '') {
+        return Apphelpers.flashMessage("error", "Kindly select a Country");
+    }
+    if (!state || state === '') {
+        return Apphelpers.flashMessage("error", "Kindly select a State");
+    }
+    if (!city || city === '') {
+        return Apphelpers.flashMessage("error", "Kindly select a city");
+    }
+    if (!address || address === '') {
+        return Apphelpers.flashMessage("error", "Kindly enter your address");
+    }
+ 
+    const bodyData = JSON.stringify({
+        country: country,
+        phone_country_code: phonecode,
+        phone_number: phone,
+        state: state,
+        city: city,
+        gender: gender,
+        dob: dob,
+        address: address,
+    });
+ 
+    const sendData = {
+        url: Apphelpers.url.director_profile,
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token,
+        },
+        body: bodyData
+    };
+ 
+    setLoading(true);
+ 
+    Apphelpers.sendRequest(sendData, res => {
+        setLoading(false);
+        if (res.status === '00') {
+            navigate('/account-setup');
+            Apphelpers.flashMessage("success", res.message);
+        } else {
+            Apphelpers.flashMessage("error", res.message);
+        }
+    });
+ };
+ 
 
-   const token = sessionStorage.getItem('token');
+ Myfunctions.ProfileProgress = async (navigate, setProfileProgress) => {
+    let token = sessionStorage.getItem('token');
+    if (!token || token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
 
-   const { phone, phonecode, dob, city, address, gender, country, state } = formData;
+    let sendData = {
+        url: Apphelpers.url.profile_progress,
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token,
+        },
+        body: JSON.stringify({}),
+    };
 
-   if (!gender || gender === '') {
-       return Apphelpers.flashMessage("error", "Kindly select gender");
-   }
-   if (!phone || phone === '') {
-       return Apphelpers.flashMessage("error", "Kindly enter phone number");
-   }
-   if (!dob || dob === '') {
-       return Apphelpers.flashMessage("error", "Kindly enter date of birth");
-   }
-   if (!country || country === '') {
-       return Apphelpers.flashMessage("error", "Kindly select a Country");
-   }
-   if (!state || state === '') {
-       return Apphelpers.flashMessage("error", "Kindly select a State");
-   }
-   if (!city || city === '') {
-       return Apphelpers.flashMessage("error", "Kindly select a city");
-   }
-   if (!address || address === '') {
-       return Apphelpers.flashMessage("error", "Kindly enter your address");
-   }
-
-
-   const bodyData = JSON.stringify({
-       country: country,
-       phone_country_code: phonecode,
-       phone_number: phone,
-       state: state,
-       city: city,
-       gender: gender,
-       dob: dob,
-       address: address,
-   });
-
-   const sendData = {
-       url: Apphelpers.url.director_profile,
-       method: 'POST',
-       headers: {
-           "Accept": "application/json",
-           "Content-Type": "application/json",
-           "h-auth-signature": Apphelpers.signature,
-           "user-auth": token,
-       },
-       body: bodyData
-   };
-
-   setLoading(true);
-
-
-   Apphelpers.sendRequest(sendData, res => {
-       setLoading(false);
-       if (res.status === '00') {
-           navigate('/account-setup');
-           Apphelpers.flashMessage("success", res.message);
-       } else {
-           Apphelpers.flashMessage("error", res.message);
-       }
-   });
-
-};
-
-
-Myfunctions.ProfileProgress = async (navigate, setProfileProgress) => {
-
-   let token = sessionStorage.getItem('token');
-   if (!token || token === '') {
-       return Apphelpers.flashMessage("error", "Invalid request");
-   }
-
-   let sendData = {
-       url: Apphelpers.url.profile_progress,
-       method: 'POST',
-       headers: {
-           "Accept": "application/json",
-           "Content-Type": "application/json",
-           "h-auth-signature": Apphelpers.signature,
-           "user-auth": token,
-       },
-       body: JSON.stringify({}),
-   };
-
-   Apphelpers.sendRequest(sendData, (res) => {
-       if (res.status === '00') {
-           const profileProgress = res;
-           setProfileProgress(profileProgress);
-           if (res.business_profile !== '1') {
-               navigate('/create-profile');
-           } else if (res.director_profile !== 1) {
-               navigate('/director-profile');
-           } else if (res.cac !== '0' || res.director_id !== '1' || res.mermat !== '1' || res.pin_setup !== '1' || res.pof !== '1') {
-               navigate('/account-setup');
-           } else {
-               navigate('/index');
-           }
-       } else {
-        //    Apphelpers.flashMessage("error", res.message);
-       }
-   });
+    Apphelpers.sendRequest(sendData, (res) => {
+        if (res.status === '00') {
+            console.log(res,'ss')
+            setProfileProgress(res);
+            if (res.business_profile !== '1') {
+                navigate('/create-profile');
+            } else if (res.director_profile !== 1) {
+                navigate('/director-profile');
+            } else if (res.cac !== '1' || res.director_id !== '1' || res.mermat !== '1' || res.pin_setup !== '1' || res.pof !== '1') {
+                navigate('/account-setup');
+            } else {
+                navigate('/index');
+            }
+        } else {
+            // Apphelpers.flashMessage("error", res.message);
+        }
+    });
 };
 
 
 
 Myfunctions.uploadCAC = async (file, navigate, setProfileProgress) => {
-
-
-   return new Promise((resolve, reject) => {
-
-    let token = sessionStorage.getItem('token')
-
+    let token = sessionStorage.getItem('token');
 
     if (!token || token === '') {
-      return Apphelpers.flashMessage("error", "Invalid request");
+        return Apphelpers.flashMessage("error", "Invalid request");
     }
 
-    if (!file || file === '') {
-       return Apphelpers.flashMessage("error", "Kindly update a valid File")
+    if (!file) {
+        return Apphelpers.flashMessage("error", "Kindly update a valid File");
     }
-   
-  
-     let formData = new FormData()
-     formData.append('file', file)
- 
-     let sendData = {
-       url: Apphelpers.url.upload_cac,
-       method: 'POST',
-       headers: {
-         // "Accept": "application/json",
-         // "Content-Type": "application/json",
-         "h-auth-signature": Apphelpers.signature,
-         "user-auth": token
-       },
-       body: formData,
-     };
- 
-     Apphelpers.sendRequest(sendData, (res) => {
-       if (res.status === '00') {
-         Myfunctions.ProfileProgress(navigate, setProfileProgress)
-         return Apphelpers.flashMessage("success", res.message);
-       } else {
-         return Apphelpers.flashMessage("error", res.message);
-       }
-     });
-   });
+
+    let formData = new FormData();
+    formData.append('file', file);
+
+    let sendData = {
+        url: Apphelpers.url.upload_cac,
+        method: 'POST',
+        headers: {
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token
+        },
+        body: formData,
+    };
+
+    Apphelpers.sendRequest(sendData, (res) => {
+        if (res.status === '00') {
+            Myfunctions.ProfileProgress(navigate, setProfileProgress);
+            return Apphelpers.flashMessage("success", res.message);
+        } else {
+            return Apphelpers.flashMessage("error", res.message);
+        }
+    });
 };
+
 
 
 Myfunctions.uploadMermat  = async (file, navigate, setProfileProgress) => {
@@ -594,6 +593,7 @@ Myfunctions.Signin = async (e, navigate, setLoading, setUserData, setProfileProg
    Apphelpers.sendRequest(sendData, (res) => {
        setLoading(false);
        if (res.status === '00') {
+           
            const userProfile = res;
            sessionStorage.setItem('token', res.jwt);
            setUserData(userProfile);
@@ -687,8 +687,6 @@ Myfunctions.UpdatePassword = async (e, navigate, setLoading) => {
        token: code,
        password: new_password,
    });
-
-   console.log(bodyData,'sd')
 
    let sendData = {
        url: Apphelpers.url.reset_password,
@@ -804,7 +802,7 @@ Myfunctions.handleOTP = async (e, navigate, setLoading) => {
  };
  
 
- Myfunctions.SetPin = async (e, setLoading) => {
+ Myfunctions.SetPin = async (e, navigate, setLoading, setProfileProgress) => {
 
    e.preventDefault()
    return new Promise((resolve, reject) => {
@@ -845,6 +843,7 @@ Myfunctions.handleOTP = async (e, navigate, setLoading) => {
       setLoading(false);
        if (res.status === '00') {
            document.querySelector('#closePin').click()
+           Myfunctions.ProfileProgress(navigate, setProfileProgress)
            return Apphelpers.flashMessage("success", res.message)
        } else {
           return Apphelpers.flashMessage("error", res.message)
@@ -854,7 +853,7 @@ Myfunctions.handleOTP = async (e, navigate, setLoading) => {
  });
  };
 
- Myfunctions.BVN = async (e, setLoading) => {
+ Myfunctions.BVN = async (e, setLoading, setProfileProgress) => {
 
     e.preventDefault()
     return new Promise((resolve, reject) => {
@@ -897,6 +896,7 @@ Myfunctions.handleOTP = async (e, navigate, setLoading) => {
      Apphelpers.sendRequest(sendData, res => {
        setLoading(false);
         if (res.status === '00') {
+            Myfunctions.ProfileProgress(setProfileProgress)
             document.querySelector('#closeBVN').click()
             return Apphelpers.flashMessage("success", res.message)
         } else {
@@ -938,7 +938,7 @@ Myfunctions.SecurityQuestions = async (setSecurityQuestions) => {
  };
   
 
- Myfunctions.SetupQuestion = async (formData) => {
+ Myfunctions.SetupQuestion = async (formData, setLoading) => {
     const { questions } = formData;
 
     let token = sessionStorage.getItem('token');
@@ -948,14 +948,20 @@ Myfunctions.SecurityQuestions = async (setSecurityQuestions) => {
     }
 
     const selectedQuestions = questions.filter(q => q.question_id && q.question && q.answer);
-    
+
     if (selectedQuestions.length < 2) {
         return Apphelpers.flashMessage("error", "Kindly select at least 2 questions and provide answers");
     }
 
-    let allSuccess = true;
-
+    const questionIds = new Set();
     for (const question of selectedQuestions) {
+        if (questionIds.has(question.question_id)) {
+            return Apphelpers.flashMessage("error", "Please select different questions.");
+        }
+        questionIds.add(question.question_id);
+    }
+
+    let allPromises = selectedQuestions.map(question => {
         let bodyData = JSON.stringify({
             question_id: question.question_id,
             question: question.question,
@@ -974,19 +980,32 @@ Myfunctions.SecurityQuestions = async (setSecurityQuestions) => {
             body: bodyData,
         };
 
-        await Apphelpers.sendRequest(sendData, (res) => {
-            if (!res.status) {
-                allSuccess = false;
-                Apphelpers.flashMessage("error", res.message);
-            }
-        });
-    }
+        setLoading(true);
 
-    if (allSuccess) {
+        return new Promise(resolve => {
+            Apphelpers.sendRequest(sendData, (res) => {
+                setLoading(false);
+                if (!res.status) {
+                    resolve(res.message);
+                } else {
+                    resolve(null);
+                }
+            });
+        });
+    });
+
+    let errorMessages = await Promise.all(allPromises);
+
+    errorMessages = errorMessages.filter(message => message !== null);
+
+    if (errorMessages.length > 0) {
+        errorMessages.forEach(message => Apphelpers.flashMessage("error", message));
+    } else {
+        document.querySelector('#OpnePin').click()
+        document.querySelector('#closeSecurityQuestions').click()
         Apphelpers.flashMessage("success", "Security questions have been successfully set.");
     }
 };
-
 
 
 export default Myfunctions;

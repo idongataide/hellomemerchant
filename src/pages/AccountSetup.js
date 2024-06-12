@@ -4,21 +4,23 @@ import { Link, useNavigate } from 'react-router-dom';
 import Myfunctions from '../js/MyFuntions';
 import OtpInput from 'react-otp-input';
 import { Select } from 'antd';
-import { Country, State } from 'country-state-city';
-import useStore, { useStoreSelector } from '../js/Store/useStore';
+import { useStoreSelector } from '../js/Store/useStore';
+import useInactivityTimeout from '../js/useInactivityTimeout';
 
-const { Option } = Select;
+const { Option } = Select;  
 
 function AccountSetup() {
     const navigate = useNavigate();
-    const { setProfileProgress, setSecurityQuestions } = useStoreSelector(["setProfileProgress", "setSecurityQuestions"]);
-    const { userData, profileProgress, securityQuestions } = useStoreSelector(["userData", "profileProgress", "securityQuestions"]);
+    
+    const { profileProgress, setProfileProgress } = useStoreSelector(["profileProgress", "setProfileProgress"]);
+    const { securityQuestions, setSecurityQuestions } = useStoreSelector(["securityQuestions", "setSecurityQuestions"]);
 
 
     useEffect(() => {
+        console.log(profileProgress,'lls')
         Myfunctions.ProfileProgress(navigate, setProfileProgress);
         Myfunctions.SecurityQuestions(setSecurityQuestions);
-    }, [navigate, setProfileProgress, setSecurityQuestions]);
+    }, [navigate]);
 
     const [pin, setPin] = useState('');
     const [loading, setLoading] = useState(false);
@@ -32,7 +34,8 @@ function AccountSetup() {
     const handleCACUpload = (event) => {
         const file = event.target.files[0];
         if (file) {
-            Myfunctions.uploadCAC(file);
+            Myfunctions.uploadCAC(file, navigate, setProfileProgress);
+            event.target.value = null;
         }
     };
 
@@ -45,7 +48,9 @@ function AccountSetup() {
     const handleMermatUpload = (event) => {
         const file = event.target.files[0];
         if (file) {
-            Myfunctions.uploadMermat(file);
+            Myfunctions.uploadMermat(file, navigate, setProfileProgress);
+            event.target.value = null;
+            
         }
     };
 
@@ -58,7 +63,8 @@ function AccountSetup() {
     const handlePOFUpload = (event) => {
         const file = event.target.files[0];
         if (file) {
-            Myfunctions.uploadPOF(file);
+            Myfunctions.uploadPOF(file, navigate, setProfileProgress);
+            event.target.value = null;
         }
     };
 
@@ -71,7 +77,8 @@ function AccountSetup() {
     const handleIDUpload = (event) => {
         const file = event.target.files[0];
         if (file) {
-            Myfunctions.IDcard(file);
+            Myfunctions.IDcard(file, navigate, setProfileProgress);
+            event.target.value = null;
         }
     };
 
@@ -87,7 +94,7 @@ function AccountSetup() {
             questions: questions,
         };
 
-        Myfunctions.SetupQuestion(formData, setLoading);
+        Myfunctions.SetupQuestion(formData,  setLoading);
     };
 
     const handleQuestionChange = (index, value, option) => {
@@ -101,6 +108,8 @@ function AccountSetup() {
         newQuestions[index] = { ...newQuestions[index], answer: value };
         setQuestions(newQuestions);
     };
+
+    useInactivityTimeout();
 
     return (
         <div>
@@ -187,6 +196,8 @@ function AccountSetup() {
                                                     {profileProgress.pin_setup == '1' ? <i className='fas fa-check-circle text-green' /> : <i className='fas fa-angle-right' />}
                                                 </div>
                                             </div>
+                                            <a id="OpnePin" data-bs-toggle="modal"class="d-none" data-bs-target="#SetPin">open</a>
+
 
                                         </div>
                                     </div>
@@ -221,7 +232,7 @@ function AccountSetup() {
                                     </div>
                                 </div>
                                 <div className="text-center mt-4 pb-3">
-                                    <button type="button" onClick={(e) => { Myfunctions.SetPin(e, setLoading) }}  disabled={loading} className="btn btn-primary btn-block">{loading && <span className='spinner-border'></span>}{loading ? 'Processing...' : 'Submit'}</button>
+                                    <button type="button" onClick={(e) => { Myfunctions.SetPin(e, navigate,  setLoading, setProfileProgress) }}  disabled={loading} className="btn btn-primary btn-block">{loading && <span className='spinner-border'></span>}{loading ? 'Processing...' : 'Submit'}</button>
                                 </div>
                             </form>
                         </div>
@@ -237,7 +248,7 @@ function AccountSetup() {
                         </div>
                         <div className="modal-body">
                             <h3 className="text-center mb-2 text-secondary">Verify your BVN</h3>
-                            <form action='#' onSubmit={(e) => { Myfunctions.BVN(e, setLoading) }}>
+                            <form action='#' onSubmit={(e) => { Myfunctions.BVN(e, setLoading, setProfileProgress) }}>
                                 <div className="form-group mb-4 mt-3">
                                     <label className="mb-1"><strong>Enter BVN </strong></label>
                                     <input type="text" name='bvn' className="form-control" placeholder='Enter your BVN' />
@@ -257,7 +268,7 @@ function AccountSetup() {
                         <div className="modal-header">
                             <button type="button" id="closeSecurityQuestions" className="btn-close" data-bs-dismiss="modal"></button>
                         </div>
-                        <div className="modal-body">
+                        <div className="modal-body py-0">
                             <h3 className="text-center text-secondary">Set Security Question</h3>
                             <p className='mb-4 text-red text-center'>Kindly answer atleast 2 questions</p>
                             <form action='#' onSubmit={handleSecurity}>

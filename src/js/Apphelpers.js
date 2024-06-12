@@ -5,9 +5,9 @@
 const Apphelpers = {};
 Apphelpers.url = {};
 
-Apphelpers.ImgUrl = "https://api-portal.hellomepay.online/api/accounts/";
+Apphelpers.ImgUrl = "https://api-portal.hellomepay.online/api/accounts";
 
-const baseUrl = "https://api-portal.hellomepay.online/api/accounts/";
+const baseUrl = "https://api-portal.hellomepay.online/api/accounts";
 
 Apphelpers.signature = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9";
 
@@ -39,6 +39,41 @@ Apphelpers.sendRequest = (Obj, callback) => {
       .catch((err) => callback({ "error": "Could not connect to the server" }))
 
 }
+
+
+// Apphelpers.sendRequest = (Obj, callback) => {
+//    if (typeof callback !== 'function') {
+//        console.error('Callback is not a function');
+//        return;
+//    }
+
+//    if (typeof Obj !== 'object' || Obj === null) {
+//        callback({ "error": "Invalid request object" });
+//        return;
+//    }
+
+//    if (Obj.url === undefined) {
+//        callback({ "error": "URL is missing" });
+//        return;
+//    }
+
+//    fetch(Obj.url, Obj)
+//        .then(res => {
+//            if (!res.ok) {
+//                throw new Error('Network response was not ok');
+//            }
+//            return res.json();
+//        })
+//        .then(data => {
+//            callback(data);
+//        })
+//        .catch(error => {
+//            console.error('Fetch error:', error);
+//            callback({ "error": "Could not connect to the server" });
+//        });
+// };
+
+
 
 
 
