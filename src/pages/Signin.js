@@ -10,13 +10,11 @@ function Signin() {
 
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    const { setUserData, setProfileProgress } = useStoreSelector(["setUserData", "setProfileProgress"]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
         try {
-            await Myfunctions.Signin(e, navigate, setLoading, setUserData, setProfileProgress);
+            await Myfunctions.Signin(e, navigate, setLoading,);
         } catch (error) {
             console.error('Error during sign-in:', error);
             setLoading(false);

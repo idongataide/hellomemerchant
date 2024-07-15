@@ -3,9 +3,24 @@ import Images from './Images'
 import TopDashboard from '../Components/TopDashboard'
 import SideDashboard from '../Components/SideDashboard'
 import { Link, useNavigate } from 'react-router-dom';
+import { CreateApplication } from '../Components/Modals';
+import Myfunctions from '../js/MyFuntions';
+import useBoundStore from '../js/Store/useStore';
+import { useEffect } from 'react';
 
 
 function ApiKeys() {
+   
+
+
+    const GetKey = useBoundStore(state => state.user.GetKey);
+
+    useEffect(() => {
+        Myfunctions.FetchSecretKey()
+    }, []);
+
+
+    
   return (
     <>  
         <TopDashboard/>
@@ -27,7 +42,7 @@ function ApiKeys() {
                                                 <h2 class="font-w600 mb-3 text-white">How it works</h2>
                                                 <p class="text-white mb-6">Authenticate your API requests by including your tokens or keys to <br/>the Authorization header of each request you make. You can manage <br/> your API keys from this module</p>
                                                 <div class="d-flex">
-                                                    <Link class="btn btn-primary btn-sm float-end" to="#">Create A New Application </Link>
+                                                    <Link  data-bs-toggle="modal" data-bs-target="#CreateApplication" class="btn btn-primary btn-sm float-end" to="#">Create A New Application </Link>
                                                 </div>   
                                             </div>
                                             <img src={Images.api} className="mb-2" alt='wallet'/>
@@ -46,24 +61,32 @@ function ApiKeys() {
                                         <thead>
                                             <tr>
                                                 <th scope="col"></th>
-                                                <th scope="col">MERCHANT REFERENCE</th>
+                                                <th scope="col">APPLICATION NAME</th>
                                                 <th scope="col">CREATED BY</th>
-                                                <th scope="col">POLICY</th>
-                                                <th scope="col">DATE CREATED</th>
+                                                <th scope="col">DESCRIPTION</th>
+                                                <th scope="col">KEY</th>
                                                 <th scope="col">STATUS</th>
+                                                <th scope="col">ACTION</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {/* <tr>
-                                                <th></th>
-                                                <td>MCH-05345453489234</td>                                            
-                                                <td>Admin</td>   
-                                                <td>12th May, 2024</td>                                            
-                                                <td>Open Source</td>      
-                                                <td>Active</td>                                            
-                                            </tr>
-                                            */}
-                                            
+                                        <tr>
+                                            <th></th>
+                                            <th>{GetKey?.application_name}</th>
+                                            <td>{GetKey?.created_by}</td>                                            
+                                            <td>{GetKey?.description}</td>                                            
+                                            <td>{GetKey?.secret_key ? GetKey.secret_key.slice(-20) + '...' : ''}</td>                                            
+                                            <td>
+                                                {GetKey?.key_status === '1' ? (
+                                                    <span className="badge badge-sm bg-success">Active</span>
+                                                ) : (
+                                                    <span className="badge badge-sm bg-danger">Inactive</span>
+                                                )}
+                                            </td>                                            
+                                            <th scope="col">
+                                                <span className="badge bg-danger badge-sm">Delete</span>
+                                            </th>
+                                        </tr>
                                         </tbody>
                                     </table>
                                   <div className='w-100'>
@@ -76,6 +99,7 @@ function ApiKeys() {
                 </div>    
             </div>    
         </div>
+        <CreateApplication/>
     </>
   )
 }

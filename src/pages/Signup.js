@@ -90,7 +90,7 @@ function Signup() {
                                                             <input type="checkbox" className="form-check-input" id="basic_checkbox_1" required/>
                                                             <label className="form-check-label" for="basic_checkbox_1">
                                                                 <p className='text-center agree'>
-                                                                     I hereby consent to the Terms of Use and give consent for Hellome Money to process my data <br/> in line with Hellome Money's Privacy Policy. I also confirm I have the authorization of the <br/>
+                                                                     I hereby consent to the Terms of Use and give consent for Hellome Money to process my data in line with Hellome Money's Privacy Policy. I also confirm I have the authorization of the
                                                                     Board of Directors and the Company to create this account and provide their personal data.
                                                                 </p>
                                                             </label>

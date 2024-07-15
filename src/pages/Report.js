@@ -1,17 +1,124 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import TopDashboard from '../Components/TopDashboard'
 import SideDashboard from '../Components/SideDashboard'
 import { Link } from 'react-router-dom';
+import Myfunctions from '../js/MyFuntions';
+import useBoundStore from '../js/Store/useStore';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { RaiseDispute } from '../Components/Modals';
 
 
 function Report() {
+    const [loading, setLoading] = useState(false);
+    const [filter, setFilter] = useState('');
+    const [pdfUrl, setPdfUrl] = useState('');
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+    const [reportType, setReportType] = useState('');
+    const [noData, setNoData] = useState(false);
 
-    const [accountType, setAccountType] = useState('personal');
-      
-    const handleAccountTypeChange = (event) => {
-      setAccountType(event.target.value);
+    const transactions = useBoundStore(state => state.user.FetchTransactions);
+    const wallets = useBoundStore(state => state.user.FetchWallets);
+    const activities = useBoundStore(state => state.user.FetchActivities);
+    const disputes = useBoundStore(state => state.user.FetchDisputes);
+
+    const ExportReport = useBoundStore(state => state.user.ExportReport);
+
+
+    useEffect(() => {
+        Myfunctions.FetchTransactions();    
+        Myfunctions.FetchWallets();    
+        Myfunctions.FetchActivities();    
+        Myfunctions.FetchDisputes(); 
+    }, []);
+
+    useEffect(() => {
+        if (!loading && ExportReport?.data?.length) {
+            generatePDF();
+        } else if (!loading && ExportReport && !ExportReport.data?.length) {
+            setNoData(true);
+        }
+    }, [ExportReport, loading]);
+
+    const generatePDF = () => {
+        const doc = new jsPDF({
+            orientation: "landscape",
+        });
+        const tableData = ExportReport?.data.map((item) => [
+            item.trans_type,
+            item.amount,
+            item.trans_date,
+            item.transaction_reference,
+            item.balance_before,
+            item.after_balance,
+            item.funded_by || '-',
+            item.switch_id,
+            item.bank,
+        ]);
+
+        if (!tableData || tableData == undefined || !tableData.length ) {
+            setNoData(true);
+            return;
+        }
+
+        doc.autoTable({
+            head: [['Trans Type', 'Amount', 'Trans Date', 'Transaction Reference', 'Balance Before', 'After Balance', 'Funded By', 'Switch ID', 'Bank']],
+            body: tableData,
+        });
+
+        const pdfUrl = doc.output('bloburl');
+        setPdfUrl(pdfUrl);
+        setNoData(false);
+        console.log(pdfUrl, 'pdfUrl');
     };
-  
+
+    const handleFilterChange = (e) => {
+        setFilter(e.target.value);
+    };
+
+    const filteredTransactions = filter ? transactions.filter(transaction => transaction.trans_type === filter) : transactions;
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        setLoading(true);
+        generatePDF();
+
+        const formData = {
+            from: startDate,
+            to: endDate,
+            category: reportType,
+        };
+
+        Myfunctions.Export(e, formData, setLoading)
+
+    };
+
+    const [searchTerm, setSearchTerm] = useState('');
+    const [pendingFilter, setPendingFilter] = useState(false);
+    const [closedFilter, setClosedFilter] = useState(false);
+
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+    };
+
+    const handlePendingFilterChange = (e) => {
+        setPendingFilter(e.target.checked);
+    };
+
+    const handleClosedFilterChange = (e) => {
+        setClosedFilter(e.target.checked);
+    };
+
+    const filteredDisputes = disputes?.data?.filter(dispute => {
+        const matchesSearch = dispute.ticket_no.includes(searchTerm);
+        const matchesPending = pendingFilter ? dispute.dispute_status === 'Processing' : true;
+        const matchesClosed = closedFilter ? dispute.dispute_status === 'Closed' : true;
+
+        return matchesSearch && matchesPending && matchesClosed;
+    }) || [];
+
+
   return (
     <>
         <TopDashboard/>
@@ -25,14 +132,7 @@ function Report() {
                                 <h3 className='pages-head'>Reports</h3>
                                 <p className='pages-p'>Overview of all your reports</p>
                             </div>
-                        </div>
-                        <div class="mt-2">
-                            <select class="form-control h-43">
-                                <option selected>Filter by</option>
-                                <option>Jakarta, IDN</option>
-                                <option>Surabaya, IDN</option>
-                            </select>
-                        </div>
+                        </div>                       
                     </div>  
                     <div className=''>
                             <div class="custom-tab-1">
@@ -47,11 +147,8 @@ function Report() {
                                         <Link class="nav-link" data-bs-toggle="tab" to="#Session">Session calls</Link>
                                     </li>
                                     <li class="nav-item">
-                                        <Link class="nav-link" data-bs-toggle="tab" to="#Activity">Accounts Activity</Link>
-                                    </li>
-                                    <li class="nav-item">
-                                        <Link class="nav-link" data-bs-toggle="tab" to="#Webhooks">Webhooks</Link>
-                                    </li>
+                                        <Link class="nav-link" data-bs-toggle="tab" to="#Activities">Accounts Activity</Link>
+                                    </li>                                    
                                     <li class="nav-item">
                                         <Link class="nav-link" data-bs-toggle="tab" to="#Dispute">Dispute</Link>
                                     </li>
@@ -62,150 +159,128 @@ function Report() {
                                 <div class="tab-content">
                                     <div class="tab-pane fade show active" id="Transactions" role="tabpanel">
                                         <div class="pt-4">
-                                          <div class="card overflow-hidden min-h-350">                           
-                                                <div class="card-body p-0">
-                                                    <div class="table-responsive">
-                                                        <table class="table header-border table-hover verticle-middle">
+                                            <div className="card overflow-hidden min-h-350">
+                                                <div className='d-flex justify-content-between p-4'>
+                                                    <div className=''>
+                                                        <div className='title'>
+                                                            <h4 className=''>All Transactions</h4>
+                                                            List of all transactions performed
+                                                        </div>
+                                                    </div>
+                                                    <div className="mt-2">
+                                                        <select className="form-control h-43" onChange={handleFilterChange}>
+                                                            <option value="">Filter by</option>
+                                                            <option value="Debit">Debit</option>
+                                                            <option value="Credit">Credit</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div className="card-body p-0">
+                                                    <div className="table-responsive">
+                                                        <table className="table header-border table-hover verticle-middle">
                                                             <thead>
                                                                 <tr>
-                                                                    <th scope="col"></th>
-                                                                    <th scope="col">Product</th>
-                                                                    <th scope="col">End Point</th>
-                                                                    <th scope="col">Status</th>
-                                                                    <th scope="col">IP Address</th>
+                                                                    <th scope="col">ID</th>
+                                                                    <th scope="col">Ledger Token</th>
+                                                                    <th scope="col">Currency</th>
+                                                                    <th scope="col">Type</th>
+                                                                    <th scope="col">Category</th>
+                                                                    <th scope="col">Amount</th>
+                                                                    <th scope="col">Charge</th>
                                                                     <th scope="col">Date</th>
+                                                                    <th scope="col">Status</th>
+                                                                    <th scope="col">Reference</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
-                                                                {/* <tr>
-                                                                    <th></th>
-                                                                    <td>MCH-05345453489234</td>                                            
-                                                                    <td>Admin</td>   
-                                                                    <td>12th May, 2024</td>                                            
-                                                                    <td>Open Source</td>      
-                                                                    <td>Active</td>                                            
-                                                                </tr>
-                                                                */}                                                                
+                                                                {filteredTransactions && filteredTransactions instanceof Array && filteredTransactions.length > 0 ? (
+                                                                    filteredTransactions.map((transaction, i) => (
+                                                                        <tr key={i}>
+                                                                            <th>{i + 1}</th>
+                                                                            <td>{transaction.ledger_token}</td>
+                                                                            <td>{transaction.currency_code}</td>
+                                                                            <td>
+                                                                                <span className={`badge badge-sm ${transaction.trans_type === 'Debit' ? 'bg-danger' : 'bg-success'}`}>
+                                                                                    {transaction.trans_type}
+                                                                                </span>
+                                                                            </td>
+                                                                            <td>{transaction.trans_category}</td>
+                                                                            <td> &#8358;{Myfunctions.numberFormat(transaction.amount)}</td>
+                                                                            <td> &#8358;{Myfunctions.numberFormat(transaction.charge)}</td>
+                                                                            <td>{transaction.trans_date}</td>
+                                                                            <td>
+                                                                                <span className={`badge badge-sm ${transaction.trans_status === 'Successful' ? 'bg-success' : 'bg-danger'}`}>
+                                                                                    {transaction.trans_status}
+                                                                                </span>
+                                                                            </td>
+                                                                            <td>{transaction.trans_ref}</td>
+                                                                        </tr>
+                                                                    ))
+                                                                ) : (
+                                                                    <tr>
+                                                                        <td colSpan="9" className="text-center">No data found</td>
+                                                                    </tr>
+                                                                )}
                                                             </tbody>
                                                         </table>
-                                                        <div className='w-100'>
-                                                                <h3 className='no-data mt-5'>No Data</h3>
+                                                    </div>
+                                                </div>
+                                            </div>
+ 
+                                        </div>
+                                    </div>
+                                    <div className="tab-pane fade" id="Wallet">
+                                        <div className="pt-4">
+                                            <div className="card overflow-hidden min-h-350">
+                                                <div className='d-flex justify-content-between p-4'>
+                                                    <div className=''>
+                                                        <div className='title'>
+                                                            <h4 className=''>All Wallets</h4>
+                                                            List of all wallet accounts
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>  
+                                                <div className="card-body p-0">
+                                                    <div className="table-responsive">
+                                                        <table className="table header-border table-hover verticle-middle">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th scope="col">ID</th>
+                                                                    <th scope="col">Bank</th>
+                                                                    <th scope="col">Account Number</th>
+                                                                    <th scope="col">Account Name</th>
+                                                                    <th scope="col">Status</th>
+                                                                    <th scope="col">Entry Date</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {wallets && wallets?.data instanceof Array && wallets?.data.length > 0 ? (
+                                                                    wallets?.data.map((wallet, i) => (
+                                                                        <tr key={i}>
+                                                                            <th>{i + 1}</th>
+                                                                            <td>{wallet.bank}</td>
+                                                                            <td>{wallet.account_number}</td>
+                                                                            <td>{wallet.account_name}</td>
+                                                                            <td>
+                                                                                <span className={`badge badge-sm ${wallet.account_status === '1' ? 'bg-success' : 'bg-danger'}`}>
+                                                                                    {wallet.account_status === '1' ? 'Active' : 'Inactive'}
+                                                                                </span>
+                                                                            </td>
+                                                                            <td>{wallet.entry_date}</td>
+                                                                        </tr>
+                                                                    ))
+                                                                ) : (
+                                                                    <tr>
+                                                                        <td colSpan="6" className="text-center">No data found</td>
+                                                                    </tr>
+                                                                )}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="tab-pane fade wallet" id="Wallet">
-                                        <div className="pt-4">
-                                            <div className="row p-0 mb-4">
-                                            <div className='col-md-6'>
-                                                <div className="input-group search-area right d-lg-inline-flex">
-                                                <input type="text" className="form-control h-60" placeholder="Search by Account No. Phone,"/>
-                                                <div className="input-group-append">
-                                                    <span className="input-group-text h-60">
-                                                    <Link href="#">
-                                                        <i className="flaticon-381-search-2"></i>
-                                                    </Link>
-                                                    </span>
-                                                </div>
-                                                </div>
-                                            </div>
-                                            <div className='col-md-6'>
-                                                <div className="basic-form justify-content-end d-flex">
-                                                <form>
-                                                    <div className="mb-3">
-                                                    <div className="form-check form-check-inline">
-                                                        <label className="form-check-label">
-                                                             <input type="radio" name="account-type" className="form-check-input" value="personal"
-                                                              checked={accountType === 'personal'} onChange={handleAccountTypeChange}/>
-                                                              Personal
-                                                        </label>
-                                                    </div>
-                                                    <div className="form-check form-check-inline">
-                                                        <label className="form-check-label">
-                                                        <input type="radio" name="account-type" className="form-check-input" value="business"
-                                                            checked={accountType === 'business'} onChange={handleAccountTypeChange} />
-                                                            Business
-                                                        </label>
-                                                    </div>
-                                                    <div className="form-check form-check-inline">
-                                                        <label className="form-check-label">
-                                                        <input 
-                                                            type="radio"  name="account-type"  className="form-check-input" value="virtual" 
-                                                            checked={accountType === 'virtual'} onChange={handleAccountTypeChange} />
-                                                            Virtual Account
-                                                        </label>
-                                                    </div>
-                                                    </div>
-                                                </form>
-                                                </div>
-                                            </div>
-                                            </div>
-                                            <div className="card overflow-hidden min-h-350">
-                                            <div className="card-body p-0">
-                                                <div className="table-responsive">
-                                                <table className={`table header-border table-hover verticle-middle ${accountType === 'personal' ? 'active' : ''}`}>
-                                                    <thead>
-                                                    <tr>
-                                                        <th scope="col"></th>
-                                                        <th scope="col">Client ID</th>
-                                                        <th scope="col">Account No</th>
-                                                        <th scope="col">Names</th>
-                                                        <th scope="col">Phone</th>
-                                                        <th scope="col">Date</th>
-                                                        <th scope="col">Status</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                    <tr>
-                                                        <th></th>
-                                                        <td colSpan="6">No Data</td>
-                                                    </tr>
-                                                    </tbody>
-                                                </table>
-                                                <table className={`table header-border table-hover verticle-middle ${accountType === 'business' ? 'active' : ''}`}>
-                                                    <thead>
-                                                    <tr>
-                                                        <th scope="col"></th>
-                                                        <th scope="col">BVN</th>
-                                                        <th scope="col">Account No</th>
-                                                        <th scope="col">Company Name</th>
-                                                        <th scope="col">RC Number</th>
-                                                        <th scope="col">Date</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                    <tr>
-                                                        <th></th>
-                                                        <td colSpan="6">No Data</td>
-                                                    </tr>
-                                                    </tbody>
-                                                </table>
-                                                <table className={`table header-border table-hover verticle-middle ${accountType === 'virtual' ? 'active' : ''}`}>
-                                                    <thead>
-                                                    <tr>
-                                                        <th scope="col"></th>
-                                                        <th scope="col">Account No.</th>
-                                                        <th scope="col">Merchant Name</th>
-                                                        <th scope="col">Merchant ID</th>
-                                                        <th scope="col">Reference</th>
-                                                        <th scope="col">Amount</th>
-                                                        <th scope="col">Status</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                    <tr>
-                                                        <th></th>
-                                                        <td colSpan="6">No Data</td>
-                                                    </tr>
-                                                    </tbody>
-                                                </table>
-                                                </div>
-                                            </div>
-                                            </div>
-                                        </div>
-                                        </div>
                                     <div class="tab-pane fade" id="Session">
                                         <div class="pt-4">
                                             <div class="card overflow-hidden min-h-350">                           
@@ -242,203 +317,187 @@ function Report() {
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="tab-pane fade" id="Activity">
+                                    <div class="tab-pane fade" id="Activities">
                                         <div class="pt-4">
-                                            <div class="card overflow-hidden min-h-350">                           
-                                                <div class="card-body p-0">
-                                                    <div class="table-responsive">
-                                                        <table class="table header-border table-hover verticle-middle">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th scope="col"></th>
-                                                                    <th scope="col">Account No.</th>
-                                                                    <th scope="col">Type</th>
-                                                                    <th scope="col">Transacation ID</th>
-                                                                    <th scope="col">Amount</th>
-                                                                    <th scope="col">Date</th>
-                                                                    <th scope="col">Remark</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                {/* <tr>
-                                                                    <th></th>
-                                                                    <td>MCH-05345453489234</td>                                            
-                                                                    <td>Admin</td>   
-                                                                    <td>12th May, 2024</td>                                            
-                                                                    <td>Open Source</td>      
-                                                                    <td>Active</td>                                            
-                                                                    <td>Active</td>                                            
-                                                                </tr>
-                                                                */}                                                                
-                                                            </tbody>
-                                                        </table>
-                                                        <div className='w-100'>
-                                                                <h3 className='no-data mt-5'>No Data</h3>
+                                            <div className="card overflow-hidden min-h-350">
+                                                <div className='d-flex justify-content-between p-4'>
+                                                    <div className=''>
+                                                        <div className='title'>
+                                                            <h4 className=''>All Activities</h4>
+                                                            List of all account activities
                                                         </div>
                                                     </div>
                                                 </div>
-                                              </div>
+                                                <div className="card-body p-0">
+                                                    <div className="table-responsive">
+                                                        <table className="table header-border table-hover verticle-middle">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th scope="col">ID</th>
+                                                                    <th scope="col">Account Number</th>
+                                                                    <th scope="col">Account Name</th>
+                                                                    <th scope="col">Bank</th>
+                                                                    <th scope="col">Amount</th>
+                                                                    <th scope="col">Charge</th>
+                                                                    <th scope="col">Reference</th>
+                                                                    <th scope="col">Narration</th>
+                                                                    <th scope="col">Switch ID</th>
+                                                                    <th scope="col">Date</th>
+                                                                    <th scope="col">Status</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {activities && activities?.data instanceof Array && activities?.data.length > 0 ? (
+                                                                    activities?.data.map((activity, i) => (
+                                                                        <tr key={i}>
+                                                                            <th>{i + 1}</th>
+                                                                            <td>{activity.account_number}</td>
+                                                                            <td>{activity.account_name}</td>
+                                                                            <td>{activity.bank_name}</td>
+                                                                            <td>&#8358; {Myfunctions.numberFormat(activity.amount)}</td>
+                                                                            <td>&#8358; {Myfunctions.numberFormat(activity.charge)}</td>
+                                                                            <td>{activity.transaction_reference}</td>
+                                                                            <td>{activity.narration}</td>
+                                                                            <td>{activity.switch_id.slice(0, 10) + '...'}</td>
+                                                                            <td>{activity.date}</td>
+                                                                            <td>
+                                                                                <span className={`badge badge-sm ${activity.status === 'Successful' ? 'bg-success' : 'bg-danger'}`}>
+                                                                                    {activity.status}
+                                                                                </span>
+                                                                            </td>
+                                                                        </tr>
+                                                                    ))
+                                                                ) : (
+                                                                    <tr>
+                                                                        <td colSpan="11" className="text-center">No data found</td>
+                                                                    </tr>
+                                                                )}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="tab-pane fade" id="Webhooks">
-                                        <div class="pt-4">
-                                            <div class="row p-0 mb-5">
-                                                <div className='col-md-6 mt-2'>
-                                                    <div class="input-group search-area right d-lg-inline-flex mt-4">
-                                                        <input type="text" class="form-control h-60" placeholder="Search"/>
-                                                        <div class="input-group-append">
-                                                            <span class="input-group-text h-60">
+                                    
+                                    <div className="tab-pane fade" id="Dispute">
+                                        <div className="pt-4">
+                                            <div className="row p-0 mb-4">
+                                                <div className='col-md-5'>
+                                                    <div className="input-group search-area right d-lg-inline-flex">
+                                                        <input
+                                                            type="text"
+                                                            className="form-control h-60"
+                                                            placeholder="Search by Ticket No."
+                                                            value={searchTerm}
+                                                            onChange={handleSearchChange}
+                                                        />
+                                                        <div className="input-group-append">
+                                                            <span className="input-group-text h-60">
                                                                 <Link href="#">
-                                                                    <i class="flaticon-381-search-2"></i>
+                                                                    <i className="flaticon-381-search-2"></i>
                                                                 </Link>
                                                             </span>
                                                         </div>
                                                     </div>
                                                 </div>
+                                                <div className='col-md-2'>
+                                                    <button data-bs-toggle="modal" data-bs-target="#RaiseDispute" className="btn btn-primary btn-xs mt-2">Raise Dispute</button>
+                                                </div>
                                                 <div className='col-md-5'>
-                                                    <label class="form-label">Filter By</label>
-                                                    <select class="form-control bg-white h-60 mt-3 mt-sm-0">
-                                                        <label>Filter </label>
-                                                        <option> All</option>
-                                                        <option> Weekly (2021)</option>
-                                                        <option> Daily (2021)</option>
-                                                    </select>
-                                                </div>   
-                                                <div className='col-md-1 mt-3'>
-                                                    <div class="d-flex justify-content-end">
-                                                        <button class="btn btn-primary btn-xs mt-4" href="#">Clear</button>
-                                                    </div> 
-                                                </div>                       
-                                            </div>                       
-                                             <div class="card overflow-hidden min-h-350">    
-                                                <div class="card-body p-0">
-                                                    <div class="table-responsive">
-                                                        <table class="table header-border table-hover verticle-middle">
+                                                    <div className="basic-form justify-content-end d-flex">
+                                                        <form>
+                                                            <div className="mb-3">
+                                                                <div className="form-check form-check-inline">
+                                                                    <label className="form-check-label">
+                                                                        <input type="checkbox" className="form-check-input" value="" checked={pendingFilter} onChange={handlePendingFilterChange}/>
+                                                                        Pending Disputes
+                                                                    </label>
+                                                                </div>
+                                                                <div className="form-check form-check-inline">
+                                                                    <label className="form-check-label">
+                                                                        <input type="checkbox" className="form-check-input" value="" checked={closedFilter} onChange={handleClosedFilterChange}/>
+                                                                        Closed Disputes
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="card overflow-hidden min-h-350">
+                                                <div className="card-body p-0">
+                                                    <div className="table-responsive">
+                                                        <table className="table header-border table-hover verticle-middle">
                                                             <thead>
                                                                 <tr>
-                                                                    <th scope="col"></th>
-                                                                    <th scope="col">Session ID </th>
+                                                                    <th scope="col">Ticket No</th>
                                                                     <th scope="col">Transaction ID</th>
-                                                                    <th scope="col">Amount</th>
-                                                                    <th scope="col">To Account</th>
+                                                                    <th scope="col">Format</th>
+                                                                    <th scope="col">Description</th>
                                                                     <th scope="col">Status</th>
                                                                     <th scope="col">Date Created</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
-                                                                {/* <tr>
-                                                                    <th></th>
-                                                                    <td>MCH-05345453489234</td>                                            
-                                                                    <td>Admin</td>   
-                                                                    <td>12th May, 2024</td>                                            
-                                                                    <td>Open Source</td>      
-                                                                    <td>Active</td>                                            
-                                                                    <td>Active</td>                                            
-                                                                </tr>
-                                                                */}                                                                
+                                                                {filteredDisputes.length > 0 ? (
+                                                                    filteredDisputes.map((dispute, index) => (
+                                                                        <tr key={index}>
+                                                                            <td>{dispute.ticket_no}</td>
+                                                                            <td>{dispute.transaction_id}</td>
+                                                                            <td>{dispute.format}</td>
+                                                                            <td>{dispute.description}</td>
+                                                                            <td>{dispute.dispute_status}</td>
+                                                                            <td>{dispute.entry_date}</td>
+                                                                        </tr>
+                                                                    ))
+                                                                ) : (
+                                                                    <tr>
+                                                                        <td colSpan="6" className="text-center">No Data</td>
+                                                                    </tr>
+                                                                )}
                                                             </tbody>
                                                         </table>
-                                                        <div className='w-100'>
-                                                                <h3 className='no-data mt-5'>No Data</h3>
-                                                        </div>
                                                     </div>
                                                 </div>
-                                             </div>
-                                        </div>
-                                    </div>
-                                    <div class="tab-pane fade" id="Dispute">
-                                        <div class="pt-4">
-                                            <div class="row p-0 mb-4">
-                                                    <div className='col-md-6'>
-                                                        <div class="input-group search-area right d-lg-inline-flex">
-                                                            <input type="text" class="form-control h-60" placeholder="Search by Account No. Phone,"/>
-                                                            <div class="input-group-append">
-                                                                <span class="input-group-text h-60">
-                                                                    <Link href="#">
-                                                                        <i class="flaticon-381-search-2"></i>
-                                                                    </Link>
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </div>                                                     
-                                                    <div className='col-md-6'>
-                                                        <div class="basic-form justify-content-end d-flex">
-                                                                <form>
-                                                                    <div class="mb-3">                                                                      
-                                                                        <div class="form-check form-check-inline">
-                                                                            <label class="form-check-label">
-                                                                                <input type="checkbox" class="form-check-input" value=""/>Pending Disputes
-                                                                            </label>
-                                                                        </div>
-                                                                        <div class="form-check form-check-inline disabled">
-                                                                            <label class="form-check-label">
-                                                                                <input type="checkbox" class="form-check-input" value="" disabled=""/>Closed Disputes
-                                                                            </label>
-                                                                        </div>
-                                                                    </div>
-                                                                </form>
-                                                            </div> 
-                                                    </div>                       
-                                                </div>                       
-                                                <div class="card overflow-hidden min-h-350">    
-                                                    <div class="card-body p-0">
-                                                        <div class="table-responsive">
-                                                            <table class="table header-border table-hover verticle-middle">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th scope="col"></th>
-                                                                        <th scope="col">Session ID </th>
-                                                                        <th scope="col">Transaction ID</th>
-                                                                        <th scope="col">Amount</th>
-                                                                        <th scope="col">To Account</th>
-                                                                        <th scope="col">Status</th>
-                                                                        <th scope="col">Date Created</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    {/* <tr>
-                                                                        <th></th>
-                                                                        <td>MCH-05345453489234</td>                                            
-                                                                        <td>Admin</td>   
-                                                                        <td>12th May, 2024</td>                                            
-                                                                        <td>Open Source</td>      
-                                                                        <td>Active</td>                                            
-                                                                        <td>Active</td>                                            
-                                                                    </tr>
-                                                                    */}                                                                
-                                                                </tbody>
-                                                            </table>
-                                                            <div className='w-100'>
-                                                                    <h3 className='no-data mt-5'>No Data</h3>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="tab-pane fade" id="Exports">
                                         <div class="pt-4">
-                                           <form className=''> 
-                                                <div className='col-xl-4 col-lg-5 col-md-12'>
-                                                    <select class="form-control bg-white h-60 mt-3 mt-sm-0">
-                                                        <label>Select Report Type </label>
-                                                        <option> All</option>
-                                                        <option> Weekly (2021)</option>
-                                                        <option> Daily (2021)</option>
-                                                    </select>
+                                          <form className=''>
+                                                <div className='col-xl-4 col-lg-5 col-md-12'>  
                                                     <div class="mt-3">
-                                                        <label class="form-label">Start Date</label>
-                                                        <input type="date" class="form-control"/>
-                                                    </div> 
-                                                    <div class="mt-3">
-                                                        <label class="form-label">End Date</label>
-                                                        <input type="date" class="form-control"/>
-                                                    </div> 
-                                                    <div class="d-flex justify-content-end">
-                                                        <button class="btn btn-primary btn-xs mt-3" href="#">Generate</button>
+                                                        <label className='form-label'>Select Report Type </label>
+                                                        <select className="form-control bg-white h-60 mt-3 mt-sm-0" value={reportType} onChange={(e) => setReportType(e.target.value)} >
+                                                            <option value="">Select transaction type</option>
+                                                            <option value="Transfer">Transfer</option>
+                                                            <option value="Account Funding">Account Funding</option>
+                                                        </select>                                                      
+                                                    </div>                                                
+                                                    <div className="mt-3">
+                                                        <label className="form-label">Start Date</label>
+                                                        <input type="date" className="form-control" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+                                                    </div>
+                                                    <div className="mt-3">
+                                                        <label className="form-label">End Date</label>
+                                                        <input type="date" className="form-control" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+                                                    </div>
+                                                    <div className="d-flex justify-content-end">
+                                                        <button className="btn btn-primary btn-xs mt-3"  disabled={loading} onClick={handleSubmit}>{loading ? 'Processing...' : 'Export'}</button>
                                                     </div>
                                                 </div>
                                             </form>
+                                            {noData && (
+                                                <div className="mt-3">
+                                                    <p>No transactions for the selected date range</p>
+                                                </div>
+                                            )}
+                                            {pdfUrl && !noData && (
+                                                <div className="mt-3">
+                                                    <iframe src={pdfUrl} width="100%" height="500px" />
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -449,6 +508,7 @@ function Report() {
                 </div>    
             </div>    
         </div>
+        <RaiseDispute/>
     </>
   )
 }

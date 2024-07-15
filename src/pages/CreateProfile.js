@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Myfunctions from '../js/MyFuntions';
 import { Select } from 'antd';
 import { Country, State } from 'country-state-city';
-import useStore, { useStoreSelector } from '../js/Store/useStore';
+import useBoundStore, { useStoreSelector } from '../js/Store/useStore';
 
 const { Option } = Select;
 
@@ -13,16 +13,24 @@ function CreateProfile() {
 
     const navigate = useNavigate();
 
-    const { setProfileProgress } = useStoreSelector(["SetProfileProgress"]);
-
+ 
     useEffect(() => {
-        Myfunctions.ProfileProgress(navigate, setProfileProgress)
+        Myfunctions.ProfileProgress(navigate)
      }, [])
 
     const [loading, setLoading] = useState(false);
 
-    const OPTIONS = ['Private Unlimited', 'LTD', 'Plc', 'Old Public Company', 'Private Unlimited Nsc', 'Assurance Company', 'Oversea Company', 'Eeig', 'Icvc Securities', 'Icvc Warrants', 'Royal Charter', 'Unregitered Company', 'Others'];
-    const BusinessIndustry = ['Agric content services', 'Agriculture/Farming', 'Art Dealers', 'Boat Dealers'];
+    
+    const BusinessIndustry = [
+        'Administrative Services', 'Agriculture Services', 'Wholesale Banking', 'Construction & Renovation',
+        'Education & Training', 'Fashion/Textiles', 'Finance and Insurance Services', 'Fintech',
+        'Food Processing Services', 'Freight & Logistic Services', 'Healthcare & Social Works',
+        'Hospitality/Ticketing/Tourism', 'Import & Export', 'Information and Communication Technology',
+        'Manufacturing', 'Media, Entertainment and Recreation', 'Mining and Quarrying', 'Oil And Gas',
+        'Other Services', 'Professional Services', 'Real Estate Activities', 'Remittance Service',
+        'Technology Services', 'Telecommunication', 'Transportation and Storage', 'Wholesale/Retail Trade'
+    ];
+    
 
     const [selectedBusinessType, setSelectedBusinessType] = useState(null);
     const [selectedIndustry, setSelectedIndustry] = useState(null);
@@ -33,7 +41,7 @@ function CreateProfile() {
     const handleSubmit = (e) => {
         e.preventDefault();
         const formData = {
-            businessType: selectedBusinessType,
+            // businessType: selectedBusinessType,
             industry: selectedIndustry,
             country: selectedCountry ? selectedCountry.name : null,
             countryIsoCode: selectedCountry ? selectedCountry.isoCode : null,
@@ -67,7 +75,7 @@ function CreateProfile() {
                                             <h3 className="text-center mb-4">Create Business Profile</h3>
                                             <form onSubmit={handleSubmit} action="#">
                                                 <div className='row'>
-                                                    <div className='mb-3 col-md-6'>
+                                                    {/* <div className='mb-3 col-md-12'>
                                                         <div className="form-group">
                                                             <label className="mb-1"><strong>Business Type</strong></label>
                                                             <Select
@@ -82,8 +90,8 @@ function CreateProfile() {
                                                                 }))}
                                                             />
                                                         </div>
-                                                    </div>
-                                                    <div className='mb-3 col-md-6'>
+                                                    </div> */}
+                                                    <div className='mb-3 col-md-12'>
                                                         <div className="form-group">
                                                             <label className="mb-1"><strong>Business Industry</strong></label>
                                                             <Select

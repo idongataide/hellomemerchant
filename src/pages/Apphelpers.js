@@ -9,8 +9,6 @@ Apphelpers.ImgUrl = "https://api-portal.hellomepay.online/api/accounts";
 
 const baseUrl = "https://api-portal.hellomepay.online/api/accounts";
 const baseUrlWallet = "https://api-portal.hellomepay.online/api/wallet";
-const baseUrlTransfer = "https://api-portal.hellomepay.online/api/transfer";
-const baseUrlReport = "https://api-portal.hellomepay.online/api/reports";
 
 Apphelpers.signature = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9";
 
@@ -40,21 +38,6 @@ Apphelpers.url.set_webhook = `${baseUrlWallet}/set_webhook`;
 Apphelpers.url.whitelist_ip = `${baseUrlWallet}/whitelist_ip`;
 Apphelpers.url.fetch_webhook = `${baseUrlWallet}/fetch_webhook`;
 Apphelpers.url.fetchIpaddress = `${baseUrlWallet}/fetchIpaddress`;
-Apphelpers.url.wallet_balance = `${baseUrlWallet}/wallet_balance`;
-Apphelpers.url.delete_ip = `${baseUrlWallet}/delete_ip`;
-Apphelpers.url.fetch_business_profile = `${baseUrl}/fetch_business_profile`;
-Apphelpers.url.fetch_profile = `${baseUrl}/fetch_profile`;
-Apphelpers.url.bank_list = `${baseUrlTransfer}/bank_list`;
-Apphelpers.url.beneficiary_enquiry = `${baseUrlTransfer}/beneficiary_enquiry`;
-Apphelpers.url.transfer = `${baseUrlTransfer}/transfer`;
-Apphelpers.url.confirm_pin = `${baseUrlTransfer}/confirm_pin`;
-Apphelpers.url.fetch_transactions = `${baseUrlTransfer}/fetch_transactions`;
-Apphelpers.url.fetch_wallets = `${baseUrlReport}/fetch_wallets`;
-Apphelpers.url.account_activity = `${baseUrlReport}/account_activity`;
-Apphelpers.url.fetch_disputes = `${baseUrlReport}/fetch_disputes`;
-Apphelpers.url.exports = `${baseUrlReport}/exports`;
-Apphelpers.url.create_dispute = `${baseUrlReport}/create_dispute`;
-Apphelpers.url.fetch_charges = `${baseUrlReport}/fetch_charges`;
 
 
 

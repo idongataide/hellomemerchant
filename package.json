@@ -10,6 +10,8 @@
     "country-flag-emoji": "^1.0.3",
     "country-list": "^2.2.0",
     "country-state-city": "3.1.2",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.2",
     "react": "^18.2.0",
     "react-country-list": "^1.0.6",
     "react-country-state-city": "^1.1.0",

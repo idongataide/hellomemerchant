@@ -35,7 +35,21 @@
     <script src="%PUBLIC_URL%/assets/vendor/swiper/js/swiper-bundle.min.js" type="text/javascript"></script>
     <script src="%PUBLIC_URL%/assets/js/deznav-init.js" type="text/javascript"></script>
  
- 
+    <script>
+      function initFreshChat() {
+        window.fcWidget.init({
+             token: "7faa1528-cb0d-4fed-a177-e823cf92c696",
+         host: "https://hellomelimited-help.freshchat.com",
+         widgetUuid: "086524e6-f816-436f-a5d6-15d1f87f6001"
+        });
+      }
+      function initialize(i,t){var e;i.getElementById(t)?
+      initFreshChat():((e=i.createElement("script")).id=t,e.async=!0,
+      e.src="https://hellomelimited-help.freshchat.com/js/widget.js",e.onload=initFreshChat,i.head.appendChild(e))}
+      function initiateCall(){initialize(document,"Freshchat-js-sdk")}
+      window.addEventListener?window.addEventListener("load",initiateCall,!1):
+      window.attachEvent("load",initiateCall,!1);
+    </script>
  </body>
  
 

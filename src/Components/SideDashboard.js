@@ -1,6 +1,7 @@
 import React from 'react'
 import Images from '../pages/Images'
 import { Link, useLocation } from 'react-router-dom'
+import { ProceedLogout } from './Modals';
 
 
 function SideDashboard() {
@@ -31,7 +32,12 @@ function SideDashboard() {
                             <span class="nav-text">Product</span>
                          </Link>
                     </li>
-
+                    <li className={isLinkActive('/transfer')}>
+                        <Link to="/transfer" class="ai-icon" aria-expanded="false">
+                            <img src={Images.d5} alt='icons'/>
+                            <span class="nav-text">Transfer</span>
+                         </Link>
+                    </li>
                     <li className={isLinkActive('/api')}>
                         <Link to="/api" class="ai-icon" aria-expanded="false">
                             <img src={Images.d3} alt='icons'/>
@@ -44,21 +50,28 @@ function SideDashboard() {
                             <span class="nav-text">Report</span>
                         </Link>
                     </li>
+                    {/* <li className={isLinkActive('/settings')}>
+                        <Link to="/settings" class="ai-icon" aria-expanded="false">
+                            <img src={Images.d4} alt='icons'/>
+                            <span class="nav-text">Settings</span>
+                        </Link>
+                    </li> */}
                 
                 </ul>
 
                 <ul class="metismenu mt-120" id="menu">                    
                 
-                    <li><a href="#" class="ai-icon" aria-expanded="false">
-                            <i class="flaticon-381-settings-2"></i>
+                    <li>
+                        <Link href="#" class="ai-icon" data-bs-toggle="modal" data-bs-target="#LogOut" aria-expanded="false">
+                            <i class="fa fa-sign-out-alt"></i>
                             <span class="nav-text">Logout</span>
-                        </a>
+                        </Link>
                     </li>                
                 
                 </ul>
             </div>
         </div>
-      
+      <ProceedLogout/>
     </>
   )
 }

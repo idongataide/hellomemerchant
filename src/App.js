@@ -18,6 +18,7 @@ import AccountSetup from './pages/AccountSetup';
 import CreateProfile from './pages/CreateProfile';
 import DirectorProfile from './pages/DirectorProfile';
 import UpdatePassword from './pages/UpdatePassword';
+import Transfer from './pages/Transfer';
 
 
 function App() {
@@ -44,7 +45,9 @@ function App() {
                   <Route path="/product" element={<Product/>} /> 
                   <Route path="/api" element={<ApiKeys/>} /> 
                   <Route path="/report" element={<Report/>} /> 
+                  <Route path="/transfer" element={<Transfer/>} /> 
                   <Route path="/settings" element={<Settings/>} /> 
+                  <Route exact path="/settings/:id" element={<Settings/>} /> 
 
                </Routes>
             </Router>

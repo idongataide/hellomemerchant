@@ -2036,7 +2036,7 @@ progress {
 }
 
 textarea.form-control {
-  min-height: calc(1.5em + 0.75rem + 2px);
+  min-height: calc(10em + 0.75rem + 2px);
 }
 
 textarea.form-control-sm {
@@ -3751,7 +3751,7 @@ fieldset:disabled .btn {
 .badge {
   display: inline-block;
   padding: 0.35em 0.65em;
-  font-size: 0.75em;
+  font-size: 12px;
   font-weight: 700;
   line-height: 1;
   color: #fff;
@@ -4492,6 +4492,7 @@ fieldset:disabled .btn {
 .modal-title {
   margin-bottom: 0;
   line-height: 1.5;
+  font-size: 22px;
 }
 
 .modal-body {
@@ -10881,7 +10882,7 @@ a.active {
   transition: all 0.2s ease;
   background: #fff;
   border-bottom: 3px solid #1b152d;
-  height: 120px;
+  height: 90px;
 }
 .header .header-content {
   height: 100%;
@@ -15357,7 +15358,7 @@ select.form-control:active {
   border: 1.5px solid #7f838450;
   padding: 0.3125rem 1.25rem;
   color: #6e6e6e;
-  height: 60px;
+  height: 50px;
   border-radius: 0.5rem;
 }
 
@@ -15366,8 +15367,44 @@ select.form-control:active {
 }
 
 .h-60 {
-  height: 60px;
+  height: 50px;
 }
+
+
+/* PreviewTransactions */
+.divborder{
+  background: #FFFFFF;
+  border: 1px solid #CEE8FF;
+  box-shadow: 0px 4px 30px rgb(6 83 216 / 2%);
+  border-radius: 14px;
+  padding:20px 20px;
+  margin-bottom: 10px;
+}
+
+.PreviewDetails .details{
+  margin:20px 10px;
+}
+
+.PreviewDetails .details .detailstitle{
+  font-family: 'Nunito';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 24px;
+  text-align: left;
+  color: #6F7680;
+}
+.PreviewDetails .details .detailsdesc{
+ font-family: 'Nunito';
+ font-style: normal;
+ font-weight: 500;
+ font-size: 15px;
+ line-height: 24px;
+ color: #273140;
+ float: right;
+}
+
+/* PreviewTransaction Ends */
 
 @media only screen and (max-width: 1400px) {
   .form-control {
@@ -15542,7 +15579,7 @@ select.form-control:active {
   background-position: center;
   background-size: contain;
   border: 1px solid #3398FF;
-  appearance: none;
+  /* appearance: none; */
   color-adjust: exact;
 }
 .form-check-input[type="checkbox"] {
@@ -18050,19 +18087,19 @@ table {
 
 .badge-xs {
   font-size: 0.625rem;
-  padding: 0rem 0.3125rem;
+  padding: 0.1rem 0.3125rem !important;
   line-height: 1.125rem;
 }
 
 .badge-sm {
   font-size: 0.6875rem;
-  padding: 0.3125rem 0.5rem;
+  padding: 0.3125rem 0.5rem !important;
   line-height: 0.6875rem;
 }
 
 .badge-lg {
   font-size: 0.875rem;
-  padding: 0rem 0.625rem;
+  padding: 0rem 0.625rem !important;
   line-height: 1.875rem;
 }
 
@@ -18076,10 +18113,10 @@ table {
   background: #adb6c7;
 }
 
-.badge-success {
+/* .badge-success {
   background-color: #02B15A50;
   color: #04904A;
-}
+} */
 
 .bootstrap-label .label {
   display: inline-block;
@@ -18221,7 +18258,7 @@ button:focus {
   padding: 0.6rem 0.9rem;
   border-radius: 0.35rem;
   font-weight: 400;
-  font-size: 1rem;
+  font-size: 15px;
 }
 .btn:hover,
 .btn:focus,
@@ -19542,7 +19579,7 @@ code {
   /* padding: 0.2rem 4.875rem 1.2rem; */
   padding: 1.875rem;
 }
-
+/* 
 @media (min-width: 1199.98px) {
   .modal-body {
     padding: 0.2rem 4.875rem 1.2rem;
@@ -19550,7 +19587,7 @@ code {
   .modal-footer {
     padding: 0 4.875rem 3rem !important;
   }
-}
+} */
 .me-sm-2.form-control {
   margin-bottom: 15px;
 }
@@ -19579,7 +19616,7 @@ code {
 .modal-footer {
   /* padding: 0 5.875rem 3.875rem; */
   /* padding:  0 4.875rem 2rem */
-  padding: 0.4rem 1.875rem 3rem;
+  padding: 1rem 1.875rem;
 }
 
 .modal-content {
@@ -21372,7 +21409,7 @@ code {
 .table th,
 .table td {
   border-color: #eeeeee;
-  padding: 25px 9px;
+  padding: 25px 15px;
   cursor: pointer;
 }
 
@@ -21421,10 +21458,12 @@ code {
   border-color: #eeeeee;
   background-color: #c9cacb;
   color: #444444;
+  text-wrap:nowrap
 }
 .table tbody tr td {
   vertical-align: middle;
   border-color: #eeeeee;
+  text-wrap:nowrap
 }
 [data-theme-version="dark"] .table tbody tr td {
   border-color: #473f72;
@@ -23103,9 +23142,11 @@ table.dataTable.display tbody td {
 }
 
 .stacked h2 {
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 600;
   font-family: "Sora", sans-serif;
+  display: flex;
+  align-items: center;
 }
 
 .title h3.extra {
@@ -23142,7 +23183,7 @@ table.dataTable.display tbody td {
 }
 
 .title .pages-head {
-  font-size: 32px;
+  font-size: 28px;
   font-family: "Sora", sans-serif;
   font-weight: 600;
   color: var(--primary);
@@ -23267,4 +23308,11 @@ table.dataTable.display tbody td {
 .notice{
   font-size: 12px;
   margin-top: 15px;
+}
+
+.bg-transfer{
+  background: #fff;
+  padding: 50px 20px;
+  border-radius: 20px;
+  border: 1px solid #979797;
 }

@@ -4,22 +4,24 @@ import { Link, useNavigate } from 'react-router-dom';
 import Myfunctions from '../js/MyFuntions';
 import OtpInput from 'react-otp-input';
 import { Select } from 'antd';
-import { useStoreSelector } from '../js/Store/useStore';
+import useBoundStore from '../js/Store/useStore';
 import useInactivityTimeout from '../js/useInactivityTimeout';
+
 
 const { Option } = Select;  
 
 function AccountSetup() {
     const navigate = useNavigate();
     
-    const { profileProgress, setProfileProgress } = useStoreSelector(["profileProgress", "setProfileProgress"]);
-    const { securityQuestions, setSecurityQuestions } = useStoreSelector(["securityQuestions", "setSecurityQuestions"]);
+    const profileProgress = useBoundStore(state => state.user.setProfileProgress);
+    const securityQuestions = useBoundStore(state => state.user.securityQuestions);
 
+
+    console.log(profileProgress,'profileProgrsss')
 
     useEffect(() => {
-        console.log(profileProgress,'lls')
-        Myfunctions.ProfileProgress(navigate, setProfileProgress);
-        Myfunctions.SecurityQuestions(setSecurityQuestions);
+        Myfunctions.ProfileProgress(navigate);
+        Myfunctions.SecurityQuestions();
     }, [navigate]);
 
     const [pin, setPin] = useState('');
@@ -34,7 +36,7 @@ function AccountSetup() {
     const handleCACUpload = (event) => {
         const file = event.target.files[0];
         if (file) {
-            Myfunctions.uploadCAC(file, navigate, setProfileProgress);
+            Myfunctions.uploadCAC(file, navigate);
             event.target.value = null;
         }
     };
@@ -48,7 +50,7 @@ function AccountSetup() {
     const handleMermatUpload = (event) => {
         const file = event.target.files[0];
         if (file) {
-            Myfunctions.uploadMermat(file, navigate, setProfileProgress);
+            Myfunctions.uploadMermat(file, navigate);
             event.target.value = null;
             
         }
@@ -63,7 +65,7 @@ function AccountSetup() {
     const handlePOFUpload = (event) => {
         const file = event.target.files[0];
         if (file) {
-            Myfunctions.uploadPOF(file, navigate, setProfileProgress);
+            Myfunctions.uploadPOF(file, navigate);
             event.target.value = null;
         }
     };
@@ -77,7 +79,7 @@ function AccountSetup() {
     const handleIDUpload = (event) => {
         const file = event.target.files[0];
         if (file) {
-            Myfunctions.IDcard(file, navigate, setProfileProgress);
+            Myfunctions.IDcard(file, navigate);
             event.target.value = null;
         }
     };
@@ -113,10 +115,10 @@ function AccountSetup() {
 
     return (
         <div>
-            <div className="LoginBody authincation h-100- py-5">
-                <div className="container h-100">
-                    <div className="row justify-content-center h-100 align-items-center">
-                        <div className="col-lg-6 col-md-12">
+            <div className="LoginBody authincation py-5">
+                <div className="container">
+                    <div className="row justify-content-center align-items-center">
+                        <div className="col-xl-6 col-lg-7 col-md-12">
                             <div className="authincation-content">
                                 <div className="row no-gutters">
                                     <div className="col-xl-12">
@@ -126,6 +128,7 @@ function AccountSetup() {
                                             </div>
                                             <h4 className="text-secondary">Account Setup</h4>
                                             <p className='sub-text'>Just few more steps to get you all setup </p>
+                                            {profileProgress?.kyb_status  === '0'  && profileProgress?.security_question == 1 ? <div className='alert alert-danger' style={{color:'Red'}}>Your account is currently undergoing approval</div> : ''}
 
                                             <div className='setup-items mb-2'>
                                                 <div className="media style-1" onClick={CACUpload}>
@@ -134,7 +137,7 @@ function AccountSetup() {
                                                         <h6>CAC Document</h6>
                                                         <span>Provide document gotten from CAC</span>
                                                     </div>
-                                                    {profileProgress.cac == '1' ? <i className='fas fa-check-circle text-green' /> : <i className='fas fa-angle-right' />}
+                                                    {profileProgress?.cac == '1' ? <i className='fas fa-check-circle text-green' /> : <i className='fas fa-angle-right' />}
                                                 </div>
                                                 <input type="file" className='file' ref={fileInputCACRef} style={{ display: 'none' }} onChange={handleCACUpload} />
                                             </div>
@@ -146,7 +149,7 @@ function AccountSetup() {
                                                         <h6>Mermat Document</h6>
                                                         <span>Memorandum and articles of association</span>
                                                     </div>
-                                                    {profileProgress.mermat === '1' ? <i className='fas fa-check-circle text-green' /> : <i className='fas fa-angle-right' />}
+                                                    {profileProgress?.mermat === '1' ? <i className='fas fa-check-circle text-green' /> : <i className='fas fa-angle-right' />}
                                                 </div>
                                                 <input type="file" ref={fileMermatRef} style={{ display: 'none' }} onChange={handleMermatUpload} />
                                             </div>
@@ -159,7 +162,7 @@ function AccountSetup() {
                                                         <h6>Proof of Address</h6>
                                                         <span>We need to verify business address</span>
                                                     </div>
-                                                    {profileProgress.pof == '1' ? <i className='fas fa-check-circle text-green' /> : <i className='fas fa-angle-right' />}
+                                                    {profileProgress?.pof == '1' ? <i className='fas fa-check-circle text-green' /> : <i className='fas fa-angle-right' />}
                                                 </div>
                                                 <input type="file" ref={filePOFRef} style={{ display: 'none' }} onChange={handlePOFUpload} />
                                             </div>
@@ -171,7 +174,7 @@ function AccountSetup() {
                                                         <h6>Director's ID</h6>
                                                         <span>We need to verify your identity</span>
                                                     </div>
-                                                    {profileProgress.director_id == '1' ? <i className='fas fa-check-circle text-green' /> : <i className='fas fa-angle-right' />}
+                                                    {profileProgress?.director_id == '1' ? <i className='fas fa-check-circle text-green' /> : <i className='fas fa-angle-right' />}
                                                 </div>
                                                 <input type="file" ref={fileIDRef} style={{ display: 'none' }} onChange={handleIDUpload} />
                                             </div>
@@ -183,7 +186,7 @@ function AccountSetup() {
                                                         <h6>BVN</h6>
                                                         <span>Verify your bvn</span>
                                                     </div>
-                                                    {profileProgress.bvn_update == '1' ? <i className='fas fa-check-circle text-green' /> : <i className='fas fa-angle-right' />}
+                                                    {profileProgress?.bvn_update == '1' ? <i className='fas fa-check-circle text-green' /> : <i className='fas fa-angle-right' />}
                                                 </div>
                                             </div>
                                             <div className='setup-items mb-2' data-bs-toggle="modal" data-bs-target="#SecurityQuestions">
@@ -193,7 +196,7 @@ function AccountSetup() {
                                                         <h6>Security Questions</h6>
                                                         <span>Setup security questions</span>
                                                     </div>
-                                                    {profileProgress.pin_setup == '1' ? <i className='fas fa-check-circle text-green' /> : <i className='fas fa-angle-right' />}
+                                                    {profileProgress?.pin_setup == '1' ? <i className='fas fa-check-circle text-green' /> : <i className='fas fa-angle-right' />}
                                                 </div>
                                             </div>
                                             <a id="OpnePin" data-bs-toggle="modal"class="d-none" data-bs-target="#SetPin">open</a>
@@ -232,7 +235,7 @@ function AccountSetup() {
                                     </div>
                                 </div>
                                 <div className="text-center mt-4 pb-3">
-                                    <button type="button" onClick={(e) => { Myfunctions.SetPin(e, navigate,  setLoading, setProfileProgress) }}  disabled={loading} className="btn btn-primary btn-block">{loading && <span className='spinner-border'></span>}{loading ? 'Processing...' : 'Submit'}</button>
+                                    <button type="button" onClick={(e) => { Myfunctions.SetPin(e, navigate,  setLoading) }}  disabled={loading} className="btn btn-primary btn-block">{loading && <span className='spinner-border'></span>}{loading ? 'Processing...' : 'Submit'}</button>
                                 </div>
                             </form>
                         </div>
@@ -248,7 +251,7 @@ function AccountSetup() {
                         </div>
                         <div className="modal-body">
                             <h3 className="text-center mb-2 text-secondary">Verify your BVN</h3>
-                            <form action='#' onSubmit={(e) => { Myfunctions.BVN(e, setLoading, setProfileProgress) }}>
+                            <form action='#' onSubmit={(e) => { Myfunctions.BVN(e, setLoading) }}>
                                 <div className="form-group mb-4 mt-3">
                                     <label className="mb-1"><strong>Enter BVN </strong></label>
                                     <input type="text" name='bvn' className="form-control" placeholder='Enter your BVN' />

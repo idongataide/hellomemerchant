@@ -1,7 +1,7 @@
-import { } from 'react-router-dom';
 import Apphelpers from './Apphelpers';
 import ReducerAction from './Context/ReducerAction'
 import { dispatcher } from './Context/State'
+import useBoundStore from './Store/useStore';
 
 
 
@@ -27,6 +27,17 @@ Myfunctions.flash = (status, text, hide = true) => {
 
 
 
+Myfunctions.logOut = (e, navigate) => {
+    e.preventDefault()
+    localStorage.clear();
+    sessionStorage.clear();
+    navigate('/signin');
+}
+ 
+ Myfunctions.getId = (IP_id) => {
+    document.querySelector('.IP_Id').value = IP_id  
+    document.querySelector('#IP_Id').innerHTML = IP_id  
+}
 
 
 
@@ -139,6 +150,7 @@ Myfunctions.create = async (e, navigate, setLoading) => {
  });
 };
 
+
 Myfunctions.CreateProfile = async (formData, navigate, setLoading) => {
    const { businessType, industry, country, state, incorporation, RcNumeber, email, Website, business_address, phone, city, phonecode} = formData;
 
@@ -148,9 +160,9 @@ Myfunctions.CreateProfile = async (formData, navigate, setLoading) => {
       return Apphelpers.flashMessage("error", "Invalid token");
    }
 
-   if (!businessType || businessType === '') {
-       return Apphelpers.flashMessage("error", "Kindly select Business Type");
-   }
+//    if (!businessType || businessType === '') {
+//        return Apphelpers.flashMessage("error", "Kindly select Business Type");
+//    }
 
    if (!industry || industry === '') {
        return Apphelpers.flashMessage("error", "Kindly select Business Industry");
@@ -197,7 +209,7 @@ Myfunctions.CreateProfile = async (formData, navigate, setLoading) => {
        phone_number: phone,
        business_email: email,
        business_industry: industry,
-       business_type: businessType,
+    //    business_type: businessType,
        website: Website,
        rc_number: RcNumeber,
        incorporation_date: incorporation,
@@ -231,7 +243,9 @@ Myfunctions.CreateProfile = async (formData, navigate, setLoading) => {
    });
 };
 
+
 Myfunctions.DirectorProfile = (formData, navigate, setLoading) => {
+
     const token = sessionStorage.getItem('token');
     const { phone, phonecode, dob, city, address, gender, country, state } = formData;
  
@@ -305,10 +319,14 @@ Myfunctions.DirectorProfile = (formData, navigate, setLoading) => {
             Apphelpers.flashMessage("error", res.message);
         }
     });
- };
+};
  
 
- Myfunctions.ProfileProgress = async (navigate, setProfileProgress) => {
+Myfunctions.ProfileProgress = async (navigate) => {
+
+    const setUser = useBoundStore.getState().setUser;
+
+    
     let token = sessionStorage.getItem('token');
     if (!token || token === '') {
         return Apphelpers.flashMessage("error", "Invalid request");
@@ -328,16 +346,19 @@ Myfunctions.DirectorProfile = (formData, navigate, setLoading) => {
 
     Apphelpers.sendRequest(sendData, (res) => {
         if (res.status === '00') {
-            console.log(res,'ss')
-            setProfileProgress(res);
+            Myfunctions.RefreshToken()
+            const setProfileProgress = res;
+            setUser('setProfileProgress', setProfileProgress);
+            localStorage.setItem('secret_key', res.secret_key)
             if (res.business_profile !== '1') {
                 navigate('/create-profile');
             } else if (res.director_profile !== 1) {
                 navigate('/director-profile');
-            } else if (res.cac !== '1' || res.director_id !== '1' || res.mermat !== '1' || res.pin_setup !== '1' || res.pof !== '1') {
+            } else if (res.cac !== '1' || res.director_id !== '1' || res.mermat !== '1' || res.pin_setup !== '1' || res.pof !== '1' ||res.kyb_status !== '0' ||  res.security_question !== 1) {
+            // } else if (res.cac !== '1' || res.director_id !== '1' || res.mermat !== '1' || res.pin_setup !== '1' || res.pof !== '1' ||res.kyb_status !== '1' ||  res.security_question !== 1) {
                 navigate('/account-setup');
-            } else {
-                navigate('/index');
+            }  else{
+                navigate('/index')
             }
         } else {
             // Apphelpers.flashMessage("error", res.message);
@@ -346,8 +367,7 @@ Myfunctions.DirectorProfile = (formData, navigate, setLoading) => {
 };
 
 
-
-Myfunctions.uploadCAC = async (file, navigate, setProfileProgress) => {
+Myfunctions.uploadCAC = async (file, navigate) => {
     let token = sessionStorage.getItem('token');
 
     if (!token || token === '') {
@@ -373,7 +393,7 @@ Myfunctions.uploadCAC = async (file, navigate, setProfileProgress) => {
 
     Apphelpers.sendRequest(sendData, (res) => {
         if (res.status === '00') {
-            Myfunctions.ProfileProgress(navigate, setProfileProgress);
+            Myfunctions.ProfileProgress(navigate);
             return Apphelpers.flashMessage("success", res.message);
         } else {
             return Apphelpers.flashMessage("error", res.message);
@@ -382,8 +402,7 @@ Myfunctions.uploadCAC = async (file, navigate, setProfileProgress) => {
 };
 
 
-
-Myfunctions.uploadMermat  = async (file, navigate, setProfileProgress) => {
+Myfunctions.uploadMermat  = async (file, navigate) => {
 
 
    return new Promise((resolve, reject) => {
@@ -417,7 +436,7 @@ Myfunctions.uploadMermat  = async (file, navigate, setProfileProgress) => {
  
      Apphelpers.sendRequest(sendData, (res) => {
        if (res.status === '00') {
-         Myfunctions.ProfileProgress(navigate, setProfileProgress)
+         Myfunctions.ProfileProgress(navigate)
          return Apphelpers.flashMessage("success", res.message);
        } else {
          return Apphelpers.flashMessage("error", res.message);
@@ -427,7 +446,7 @@ Myfunctions.uploadMermat  = async (file, navigate, setProfileProgress) => {
 };
 
 
-Myfunctions.IDcard  = async (file, navigate, setProfileProgress) => {
+Myfunctions.IDcard  = async (file, navigate) => {
 
 
    return new Promise((resolve, reject) => {
@@ -444,7 +463,7 @@ Myfunctions.IDcard  = async (file, navigate, setProfileProgress) => {
     }
    
   
-     let formData = new FormData()
+    let formData = new FormData()
      formData.append('file', file)
  
      let sendData = {
@@ -461,7 +480,7 @@ Myfunctions.IDcard  = async (file, navigate, setProfileProgress) => {
  
      Apphelpers.sendRequest(sendData, (res) => {
        if (res.status === '00') {
-         Myfunctions.ProfileProgress(navigate, setProfileProgress)
+         Myfunctions.ProfileProgress(navigate)
          return Apphelpers.flashMessage("success", res.message);
        } else {
          return Apphelpers.flashMessage("error", res.message);
@@ -470,7 +489,7 @@ Myfunctions.IDcard  = async (file, navigate, setProfileProgress) => {
    });
 };
 
-Myfunctions.uploadPOF  = async (file, navigate, setProfileProgress) => {
+Myfunctions.uploadPOF  = async (file, navigate) => {
 
 
    return new Promise((resolve, reject) => {
@@ -504,7 +523,7 @@ Myfunctions.uploadPOF  = async (file, navigate, setProfileProgress) => {
  
      Apphelpers.sendRequest(sendData, (res) => {
        if (res.status === '00') {
-         Myfunctions.ProfileProgress(navigate, setProfileProgress)
+         Myfunctions.ProfileProgress(navigate)
          return Apphelpers.flashMessage("success", res.message);
        } else {
          return Apphelpers.flashMessage("error", res.message);
@@ -513,52 +532,12 @@ Myfunctions.uploadPOF  = async (file, navigate, setProfileProgress) => {
    });
 };
 
-// Myfunctions.Signin = async (e, navigate, setLoading) => {
-//   e.preventDefault();
-//   return new Promise((resolve, reject) => {
-//     let { email, password } = e.target.elements;
-//     email = email && email.value.trim();
-//     password = password && password.value.trim();
 
-//     if (!email || email === '') {
-//       return Apphelpers.flashMessage("error", "Kindly enter email");
-//     }
+Myfunctions.Signin = async (e, navigate, setLoading) => {
 
-//     if (!password || password === '') {
-//       return Apphelpers.flashMessage("error", "Kindly enter password");
-//     }
-
-//     let bodyData = JSON.stringify({
-//       email: email,
-//       password: password,
-//     });
-
-//     let sendData = {
-//       url: Apphelpers.url.signin,
-//       method: 'POST',
-//       headers: {
-//         "Accept": "application/json",
-//         "Content-Type": "application/json",
-//         "h-auth-signature": Apphelpers.signature,
-//       },
-//       body: bodyData,
-//     };
-//     setLoading(true);
-
-//     Apphelpers.sendRequest(sendData, (res) => {
-//       setLoading(false);
-//       if (res.status === '00') {
-//          sessionStorage.setItem('token', res.jwt)
-//          Myfunctions.ProfileProgress(navigate); 
-//       }  else {
-//          return Apphelpers.flashMessage("error", res.message);
-//       }
-//     });
-//   });
-// };
+   const setUser = useBoundStore.getState().setUser;
 
 
-Myfunctions.Signin = async (e, navigate, setLoading, setUserData, setProfileProgress) => {
    e.preventDefault();
 
    let { email, password } = e.target.elements;
@@ -591,18 +570,59 @@ Myfunctions.Signin = async (e, navigate, setLoading, setUserData, setProfileProg
    setLoading(true);
 
    Apphelpers.sendRequest(sendData, (res) => {
-       setLoading(false);
        if (res.status === '00') {
-           
+           setLoading(false);
+           sessionStorage.setItem('token', res.jwt);         
+           sessionStorage.setItem('user_token', res.user_token);
+           sessionStorage.setItem('wallet_token', res.wallet_token);
+           localStorage.setItem('webhook_status', res.webhook_status)        
            const userProfile = res;
-           sessionStorage.setItem('token', res.jwt);
-           setUserData(userProfile);
-           Myfunctions.ProfileProgress(navigate, setProfileProgress);
+           setUser('userProfile', userProfile);
+           Myfunctions.ProfileProgress(navigate);
        } else {
+           setLoading(false);
            return Apphelpers.flashMessage("error", res.message);
        }
    });
 };
+
+Myfunctions.RefreshToken = async () => {
+
+    const setUser = useBoundStore.getState().setUser;
+
+
+    let token = sessionStorage.getItem('token');
+
+    if (!token || token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+
+    let bodyData  = JSON.stringify({
+        jwt: token
+    })
+
+    let sendData = {
+        url: Apphelpers.url.refreshToken,
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token,
+        },
+        body: bodyData,
+    };
+
+    Apphelpers.sendRequest(sendData, (res) => {
+        if (res.status === '00') {      
+            const RefreshToken = res;
+            setUser('RefreshToken', RefreshToken);
+        } else {
+            // Apphelpers.flashMessage("error", res.message);
+        }
+    });
+   
+ };
 
 Myfunctions.ForgotPassword = async (e, navigate, setLoading) => {
 
@@ -802,7 +822,7 @@ Myfunctions.handleOTP = async (e, navigate, setLoading) => {
  };
  
 
- Myfunctions.SetPin = async (e, navigate, setLoading, setProfileProgress) => {
+ Myfunctions.SetPin = async (e, navigate, setLoading) => {
 
    e.preventDefault()
    return new Promise((resolve, reject) => {
@@ -843,7 +863,7 @@ Myfunctions.handleOTP = async (e, navigate, setLoading) => {
       setLoading(false);
        if (res.status === '00') {
            document.querySelector('#closePin').click()
-           Myfunctions.ProfileProgress(navigate, setProfileProgress)
+           Myfunctions.ProfileProgress(navigate)
            return Apphelpers.flashMessage("success", res.message)
        } else {
           return Apphelpers.flashMessage("error", res.message)
@@ -853,7 +873,7 @@ Myfunctions.handleOTP = async (e, navigate, setLoading) => {
  });
  };
 
- Myfunctions.BVN = async (e, setLoading, setProfileProgress) => {
+ Myfunctions.BVN = async (e, setLoading, navigate) => {
 
     e.preventDefault()
     return new Promise((resolve, reject) => {
@@ -896,7 +916,7 @@ Myfunctions.handleOTP = async (e, navigate, setLoading) => {
      Apphelpers.sendRequest(sendData, res => {
        setLoading(false);
         if (res.status === '00') {
-            Myfunctions.ProfileProgress(setProfileProgress)
+            Myfunctions.ProfileProgress(navigate)
             document.querySelector('#closeBVN').click()
             return Apphelpers.flashMessage("success", res.message)
         } else {
@@ -907,7 +927,10 @@ Myfunctions.handleOTP = async (e, navigate, setLoading) => {
   });
 };
 
-Myfunctions.SecurityQuestions = async (setSecurityQuestions) => {
+Myfunctions.SecurityQuestions = async () => {
+
+    const setUser = useBoundStore.getState().setUser;
+
 
     let token = sessionStorage.getItem('token');
     if (!token || token === '') {
@@ -927,9 +950,9 @@ Myfunctions.SecurityQuestions = async (setSecurityQuestions) => {
     };
 
     Apphelpers.sendRequest(sendData, (res) => {
-        if (res.status === true) {
+        if (res.status === true) {      
             const GetQuestions = res;
-            setSecurityQuestions(GetQuestions);
+            setUser('securityQuestions', GetQuestions);
         } else {
             // Apphelpers.flashMessage("error", res.message);
         }
@@ -938,7 +961,7 @@ Myfunctions.SecurityQuestions = async (setSecurityQuestions) => {
  };
   
 
- Myfunctions.SetupQuestion = async (formData, setLoading) => {
+Myfunctions.SetupQuestion = async (formData, setLoading) => {
     const { questions } = formData;
 
     let token = sessionStorage.getItem('token');
@@ -1007,5 +1030,1143 @@ Myfunctions.SecurityQuestions = async (setSecurityQuestions) => {
     }
 };
 
+Myfunctions.WhitelistIP = async (e, setLoading) => {
+
+    const setUser = useBoundStore.getState().setUser;
+
+    e.preventDefault();
+
+    let { ip_address } = e.target.elements;
+    ip_address = ip_address && ip_address.value.trim();
+
+    let token = sessionStorage.getItem('token');
+    let user_token = sessionStorage.getItem('user_token')
+
+    if (!token || token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+
+    if (!ip_address || ip_address === '') {
+        return Apphelpers.flashMessage("error", "Kindly enter An IP Address");
+    }
+
+    let bodyData = JSON.stringify({
+        user_token: user_token,
+        ip_address: ip_address,
+    });
+
+    let sendData = {
+        url: Apphelpers.url.whitelist_ip,
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token,
+        },
+        body: bodyData,
+    };
+
+    
+    setLoading(true);
+
+    Apphelpers.sendRequest(sendData, (res) => {
+        setLoading(false);
+        if (res.status === '00') { 
+            Myfunctions.RefreshToken()
+            Myfunctions.FetchIP()
+            document.querySelector('#closeWhiteList').click()         
+            return Apphelpers.flashMessage("success", res.message);
+        } else {
+            return Apphelpers.flashMessage("error", res.message);
+        }
+    });
+};
+
+Myfunctions.DeleteIP = async (e, setLoading) => {
+
+    const setUser = useBoundStore.getState().setUser;
+
+    e.preventDefault();
+
+    let { ip_address } = e.target.elements;
+    ip_address = ip_address && ip_address.value.trim();
+
+
+
+    let token = sessionStorage.getItem('token');
+    let user_token = sessionStorage.getItem('user_token')
+
+    if (!token || token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+
+    if (!ip_address || ip_address === '') {
+        return Apphelpers.flashMessage("error", "Kindly enter An IP Address");
+    }
+
+    let bodyData = JSON.stringify({
+        user_token: user_token,
+        ip_address: ip_address,
+    });
+
+    let sendData = {
+        url: Apphelpers.url.delete_ip,
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token,
+        },
+        body: bodyData,
+    };
+
+    
+    setLoading(true);
+
+    Apphelpers.sendRequest(sendData, (res) => {
+        setLoading(false);
+        if (res.status === '00') { 
+            Myfunctions.RefreshToken()
+            Myfunctions.FetchIP()
+            document.querySelector('.closeIP').click()         
+            return Apphelpers.flashMessage("success", res.message);
+        } else {
+            return Apphelpers.flashMessage("error", res.message);
+        }
+    });
+};
+
+Myfunctions.SetWebhookURL = async (e, setLoading) => {
+
+    const setUser = useBoundStore.getState().setUser;
+
+    e.preventDefault();
+
+    let { webhook_name, webhook_url, webhook_url_description } = e.target.elements;
+    webhook_name = webhook_name && webhook_name.value.trim();
+    webhook_url = webhook_url && webhook_url.value.trim();
+    webhook_url_description = webhook_url_description && webhook_url_description.value.trim();
+
+
+
+    let token = sessionStorage.getItem('token');
+    let user_token = sessionStorage.getItem('user_token')
+
+
+
+    if (!token || token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+
+    if (!webhook_name || webhook_name === '') {
+        return Apphelpers.flashMessage("error", "Kindly enter Web Hook Name");
+    }
+    if (!webhook_url || webhook_url === '') {
+        return Apphelpers.flashMessage("error", "Kindly enter Web Hook URL");
+    }
+    if (!webhook_url_description || webhook_url_description === '') {
+        return Apphelpers.flashMessage("error", "Kindly enter API Description");
+    }
+
+    let bodyData = JSON.stringify({
+        user_token: user_token,
+        name: webhook_name,
+        webhook_url: webhook_url,
+        description: webhook_url_description,
+    });
+
+    let sendData = {
+        url: Apphelpers.url.set_webhook,
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token,
+        },
+        body: bodyData,
+    };
+
+    
+    setLoading(true);
+
+    Apphelpers.sendRequest(sendData, (res) => {
+        setLoading(false);
+        if (res.status === '00') { 
+            Myfunctions.RefreshToken()
+            document.querySelector('#closeWebhook').click()         
+            return Apphelpers.flashMessage("success", res.message);
+        } else {
+            document.querySelector('#closeWebhook').click()         
+            return Apphelpers.flashMessage("error", res.message);
+        }
+    });
+};
+
+Myfunctions.GenerateSecretKey = async (e, navigate, setLoading) => {
+
+    const setUser = useBoundStore.getState().setUser;
+
+    e.preventDefault();
+
+    let { key_name, description } = e.target.elements;
+    key_name = key_name && key_name.value.trim();
+    description = description && description.value.trim();
+
+
+
+    let token = sessionStorage.getItem('token');
+
+    if (!token || token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+
+    if (!key_name || key_name === '') {
+        return Apphelpers.flashMessage("error", "Kindly enter API Name");
+    }
+    if (!description || description === '') {
+        return Apphelpers.flashMessage("error", "Kindly enter API Description");
+    }
+
+    let bodyData = JSON.stringify({
+        key_name: key_name,
+        description: description,
+    });
+
+    let sendData = {
+        url: Apphelpers.url.generate_key,
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token,
+        },
+        body: bodyData,
+    };
+
+    
+    setLoading(true);
+
+    Apphelpers.sendRequest(sendData, (res) => {
+        setLoading(false);
+        if (res.status === '00') { 
+            Myfunctions.ProfileProgress(navigate)
+            document.querySelector('#cancel').click() 
+            document.querySelector('.modal-backdrop').classList.add('hide')
+            document.querySelector('.modal-backdrop').classList.remove('show')
+            document.querySelector('.modal-backdrop').classList.remove('modal-backdrop')        
+            return Apphelpers.flashMessage("success", res.message);
+        } else {
+            return Apphelpers.flashMessage("error", res.message);
+        }
+    });
+};
+
+
+Myfunctions.AccountDetails = async () => {
+
+    const setUser = useBoundStore.getState().setUser;
+
+
+    let token = sessionStorage.getItem('token');
+    if (!token || token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+
+    let sendData = {
+        url: Apphelpers.url.account_details,
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token,
+        },
+        body: JSON.stringify({}),
+    };
+
+    Apphelpers.sendRequest(sendData, (res) => {
+        if (res.status === '00') {      
+            const GetAccount = res;
+            setUser('GetAccount', GetAccount);
+        } else {
+            // Apphelpers.flashMessage("error", res.message);
+        }
+    });
+   
+};
+
+
+Myfunctions.WalletBalance = async () => {
+
+    const setUser = useBoundStore.getState().setUser;
+
+    
+    let token = sessionStorage.getItem('token');
+    let user_token = sessionStorage.getItem('user_token');
+    let wallet_token = sessionStorage.getItem('wallet_token');
+
+    if (!token || token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+
+    let bodyData = JSON.stringify({
+        user_token: user_token,
+        wallet_token : wallet_token
+    })
+
+    let sendData = {
+        url: Apphelpers.url.wallet_balance,
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token,
+        },
+        body: bodyData,
+    };
+
+    Apphelpers.sendRequest(sendData, (res) => {
+        if (res.status === '00') {      
+            const WalletBalance = res;
+            setUser('WalletBalance', WalletBalance);
+        } else {
+            // Apphelpers.flashMessage("error", res.message);
+        }
+    });
+   
+ };
+  
+ Myfunctions.FetchSecretKey = async () => {
+
+    const setUser = useBoundStore.getState().setUser;
+
+
+    let token = sessionStorage.getItem('token');
+    
+    if (!token || token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+
+    let sendData = {
+        url: Apphelpers.url.fetch_key,
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token,
+        },
+        body: JSON.stringify({}),
+    };
+
+    Apphelpers.sendRequest(sendData, (res) => {
+        if (res.status === '00') {      
+            const GetKey = res;
+            setUser('GetKey', GetKey);
+        } else {
+            // Apphelpers.flashMessage("error", res.message);
+        }
+    });
+   
+ };
+
+ Myfunctions.FetchIP = async () => {
+
+    const setUser = useBoundStore.getState().setUser;
+
+
+    let token = sessionStorage.getItem('token');
+    let user_token = sessionStorage.getItem('user_token')
+
+    if (!token || token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+    if (!user_token || user_token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+
+
+    
+    let bodyData = JSON.stringify({
+        user_token: user_token,
+    });
+    let sendData = {
+        url: Apphelpers.url.fetchIpaddress,
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token,
+        },
+        body: bodyData,
+    };
+
+    Apphelpers.sendRequest(sendData, (res) => {
+        if (res.status === '00') {      
+            const FetchIP = res?.data?.data;
+            setUser('FetchIP', FetchIP);
+        } else {
+            // Apphelpers.flashMessage("error", res.message);
+        }
+    });
+   
+ };
+
+ Myfunctions.FetchWebHook = async () => {
+
+    const setUser = useBoundStore.getState().setUser;
+
+
+    let token = sessionStorage.getItem('token');
+    let user_token = sessionStorage.getItem('user_token')
+
+    if (!token || token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+
+    let bodyData = JSON.stringify({
+        user_token: user_token,
+    });
+
+    let sendData = {
+        url: Apphelpers.url.fetch_webhook,
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token,
+        },
+        body: bodyData,
+    };
+
+    Apphelpers.sendRequest(sendData, (res) => {
+        if (res.status === '00') {      
+            const FetchWebHook = res?.data?.data;
+            setUser('FetchWebHook', FetchWebHook);
+        } else {
+            // Apphelpers.flashMessage("error", res.message);
+        }
+    });
+   
+ };
+
+ Myfunctions.FetchBusinessProfile = async () => {
+
+    const setUser = useBoundStore.getState().setUser;
+
+
+    let token = sessionStorage.getItem('token');
+    let user_token = sessionStorage.getItem('user_token')
+
+    if (!token || token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+
+    let bodyData = JSON.stringify({
+        user_token: user_token,
+    });
+
+    let sendData = {
+        url: Apphelpers.url.fetch_business_profile,
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token,
+        },
+        body: bodyData,
+    };
+
+    Apphelpers.sendRequest(sendData, (res) => {
+        if (res) {      
+            const FetchBusiness = res;
+            setUser('FetchBusiness', FetchBusiness);
+        } else {
+            // Apphelpers.flashMessage("error", res.message);
+        }
+    });
+   
+ };
+
+ Myfunctions.FetchProfile = async () => {
+
+    const setUser = useBoundStore.getState().setUser;
+
+
+    let token = sessionStorage.getItem('token');
+    let user_token = sessionStorage.getItem('user_token')
+
+    if (!token || token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+
+    let bodyData = JSON.stringify({
+        user_token: user_token,
+    });
+
+    let sendData = {
+        url: Apphelpers.url.fetch_profile,
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token,
+        },
+        body: bodyData,
+    };
+
+    Apphelpers.sendRequest(sendData, (res) => {
+        if (res.status === '00') {      
+            const FetchProfile = res;
+            setUser('FetchProfile', FetchProfile);
+        } else {
+            // Apphelpers.flashMessage("error", res.message);
+        }
+    });
+   
+ };
+
+
+ Myfunctions.BankList = async () => {
+
+    const setUser = useBoundStore.getState().setUser;
+
+
+    let token = sessionStorage.getItem('token');
+
+    if (!token || token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+
+    let sendData = {
+        url: Apphelpers.url.bank_list,
+        method: 'GET',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token,
+        },
+    };
+
+    Apphelpers.sendRequest(sendData, (res) => {
+        if (res.status === '00') {      
+            const BankList = res?.data;
+            setUser('BankList', BankList);
+        } else {
+            // Apphelpers.flashMessage("error", res.message);
+        }
+    });
+   
+ };
+
+
+Myfunctions.VerifyAccountNumber = async (e, bankCode, setValidating) => {
+    e.preventDefault();
+    setValidating(true);
+
+    const setUser = useBoundStore.getState().setUser;
+    let accountNumber = document.querySelector('.account_number').value;
+    let token = sessionStorage.getItem('token');
+
+    if (!token || token === '') {
+        setValidating(false);
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+
+    if (!accountNumber || accountNumber.length<10){
+        return
+    }
+
+    let bodyData = JSON.stringify({
+        account_number: accountNumber,
+        bank_code: bankCode,
+    });
+
+    let sendData = {
+        url: Apphelpers.url.beneficiary_enquiry,
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token,
+        },
+        body: bodyData,
+    };
+
+    Apphelpers.sendRequest(sendData, (res) => {
+        setValidating(false);
+        if (res.status === '00') {      
+            document.querySelector('.account_name').textContent = res.beneficiary_name;
+            document.querySelector('.account_name').style.color = '#0D1884';
+            setUser('BeneficiaryData', res);
+        } else {
+            document.querySelector('.account_name').textContent = 'Invalid Account Number';
+            document.querySelector('.account_name').style.color = "red";
+        }
+    });
+};
+
+Myfunctions.Transfer = async (e, formData, setLoading) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const setUser = useBoundStore.getState().setUser;
+    let token = sessionStorage.getItem('token');
+    let user_token = sessionStorage.getItem('user_token');
+    let wallet_token = sessionStorage.getItem('wallet_token');
+    let account_number = document.querySelector('.account_number').value;
+    let account_name = document.querySelector('.account_name').textContent;
+    let amount = document.querySelector('.transfer_amount').value.replace(/\,/g, '');
+    let remark = document.querySelector('.naration').value;
+
+    if (!token || token === '') {
+        setLoading(false);
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+    if (!account_number || account_number.length < 10 || account_name === 'Invalid Account Number') {
+        setLoading(false);
+        return Apphelpers.flashMessage("error", "Please enter a valid account number");
+    }
+    if (!amount) {
+        setLoading(false);
+        return Apphelpers.flashMessage("error", "Please enter an amount");
+    }
+
+    const dateObject = new Date();
+    let transferDate = dateObject.toLocaleDateString();
+    let BeneficiaryData = useBoundStore.getState().user.BeneficiaryData;
+
+    let TransferPreview = {
+        bank_code: formData.bank_code,
+        user_token,
+        account_number,
+        account_name: BeneficiaryData.beneficiary_name,
+        amount,
+        remark,
+        transferDate,
+        wallet_token,
+        beneficiary_id: BeneficiaryData.beneficiary_id,
+        beneficiary_account_id: BeneficiaryData.beneficiary_account_id,
+        bank_name: BeneficiaryData.bank,
+    };
+
+    setUser('TransferPreview', TransferPreview);
+    setLoading(false);
+    document.querySelector('#ConfirmTransfer').click();
+};
+
+Myfunctions.ConfirmPin = async ({ otp, setLoading }) => {
+    setLoading(true);
+
+    let token = sessionStorage.getItem('token');
+    let user_token = sessionStorage.getItem('user_token');
+    let transaction_pin = otp;
+
+    if (!token || token === '') {
+        setLoading(false);
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+    if (!transaction_pin || transaction_pin.length < 4) {
+        setLoading(false);
+        return Apphelpers.flashMessage("error", "Please enter a valid transfer Pin");
+    }
+
+    let bodyData = JSON.stringify({
+        user_token,
+        pin: transaction_pin,
+    });
+
+    let sendData = {
+        url: Apphelpers.url.confirm_pin,
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token,
+        },
+        body: bodyData
+    };
+
+    Apphelpers.sendRequest(sendData, (res) => {
+        if (res.status === '00') {
+            Myfunctions.ConfirmTransfer(otp, setLoading);
+        } else {
+            setLoading(false);
+            Apphelpers.flashMessage("error", res.message);
+        }
+    });
+};
+
+Myfunctions.ConfirmTransfer = async (otp, setLoading) => {
+    let token = sessionStorage.getItem('token');
+    let TransferPreview = useBoundStore.getState().user.TransferPreview;
+
+    let bodyData = JSON.stringify({
+        bank_code: TransferPreview.bank_code,
+        user_token: TransferPreview.user_token,
+        account_number: TransferPreview.account_number,
+        account_name: TransferPreview.account_name,
+        amount: TransferPreview.amount,
+        remark: TransferPreview.remark,
+        wallet_token: TransferPreview.wallet_token,
+        beneficiary_id: TransferPreview.beneficiary_id,
+        beneficiary_account_id: TransferPreview.beneficiary_account_id,
+        bank_name: TransferPreview.bank_name,
+        pin: otp,
+    });
+
+    let sendData = {
+        url: Apphelpers.url.transfer,
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token,
+        },
+        body: bodyData,
+    };
+
+    Apphelpers.sendRequest(sendData, (res) => {
+        setLoading(false);
+        if (res.status === true) {
+            document.querySelector('#closeTransferPinOut').click();
+            document.querySelector('#ClosePreviewOut').click();
+            Apphelpers.flashMessage("success", res.message);
+        } else {
+            Apphelpers.flashMessage("error", res.message);
+        }
+    });
+};
+
+
+Myfunctions.FetchDisputes = async () => {
+
+    const setUser = useBoundStore.getState().setUser;
+
+
+    let token = sessionStorage.getItem('token');
+    let user_token = sessionStorage.getItem('user_token')
+
+    if (!token || token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+    if (!user_token || user_token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+
+
+    
+    let bodyData = JSON.stringify({
+        user_token: user_token,
+    });
+    let sendData = {
+        url: Apphelpers.url.fetch_disputes,
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token,
+        },
+        body: bodyData,
+    };
+
+    Apphelpers.sendRequest(sendData, (res) => {
+        if (res.status == '00') {      
+            const FetchDisputes = res?.data;
+            setUser('FetchDisputes', FetchDisputes);
+        } else {
+            // Apphelpers.flashMessage("error", res.message);
+        }
+    });
+   
+};
+
+
+Myfunctions.RaiseDispute = async (e, setLoading) => {
+    const setUser = useBoundStore.getState().setUser;
+
+    e.preventDefault();
+
+    let { transaction_id, format, dispute_desc } = e.target.elements;
+    transaction_id = transaction_id && transaction_id.value.trim();
+    format = format && format.value;
+    dispute_desc = dispute_desc && dispute_desc.value.trim();
+
+    let token = sessionStorage.getItem('token');
+    let user_token = sessionStorage.getItem('user_token');
+
+    if (!token || token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+
+    if (!transaction_id || transaction_id === '') {
+        return Apphelpers.flashMessage("error", "Kindly enter a Transaction ID");
+    }
+
+    let bodyData = JSON.stringify({
+        user_token: user_token,
+        transaction_id: transaction_id,
+        format: format,
+        description: dispute_desc,
+    });
+
+    let sendData = {
+        url: Apphelpers.url.create_dispute,
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token,
+        },
+        body: bodyData,
+    };
+
+    setLoading(true);
+
+    Apphelpers.sendRequest(sendData, (res) => {
+        setLoading(false);
+        if (res.status === '00') { 
+            Myfunctions.RefreshToken();
+            Myfunctions.FetchDisputes();
+            document.querySelector('#closeDispute').click();
+            return Apphelpers.flashMessage("success", res.message);
+        } else {
+            return Apphelpers.flashMessage("error", res.message);
+        }
+    });
+};
+
+
+Myfunctions.FetchActivities = async () => {
+
+    const setUser = useBoundStore.getState().setUser;
+
+
+    let token = sessionStorage.getItem('token');
+    let user_token = sessionStorage.getItem('user_token')
+
+    if (!token || token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+    if (!user_token || user_token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+
+
+    
+    let bodyData = JSON.stringify({
+        user_token: user_token,
+    });
+    let sendData = {
+        url: Apphelpers.url.account_activity,
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token,
+        },
+        body: bodyData,
+    };
+
+    Apphelpers.sendRequest(sendData, (res) => {
+        if (res) {      
+            const FetchActivities = res?.data;
+            setUser('FetchActivities', FetchActivities);
+        } else {
+            // Apphelpers.flashMessage("error", res.message);
+        }
+    });
+   
+};
+
+Myfunctions.Export = async (e, formData, setLoading) => {
+
+    const setUser = useBoundStore.getState().setUser;
+
+    e.preventDefault();
+
+   let startDate = formData.from
+   let endDate = formData.to
+   let category = formData.category
+
+
+    let token = sessionStorage.getItem('token');
+
+    let user_token = sessionStorage.getItem('user_token');
+
+
+    if (!token || token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+
+    if (!startDate || startDate === '') {
+        return Apphelpers.flashMessage("error", "Kindly enter Start Date");
+    }
+    if (!endDate || endDate === '') {
+        return Apphelpers.flashMessage("error", "Kindly enter End Date");
+    }
+
+    let bodyData = JSON.stringify({
+        user_token: user_token,
+        from: startDate,
+        to: endDate,
+        category: category,
+    });
+
+    let sendData = {
+        url: Apphelpers.url.exports,
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token,
+        },
+        body: bodyData,
+    };
+
+    
+    setLoading(true);
+
+    Apphelpers.sendRequest(sendData, (res) => {
+        setLoading(false);
+        if (res.status == '00') {  
+            const ExportReport = res?.data;
+            setUser('ExportReport', ExportReport);             
+            return Apphelpers.flashMessage("success", 'Report Generated');
+        } else {
+            return Apphelpers.flashMessage("error", res.message);
+        }
+    });
+};
+
+Myfunctions.FetchTransactions = async () => {
+
+    const setUser = useBoundStore.getState().setUser;
+
+
+    let token = sessionStorage.getItem('token');
+    let user_token = sessionStorage.getItem('user_token')
+
+    if (!token || token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+    if (!user_token || user_token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+
+
+    
+    let bodyData = JSON.stringify({
+        user_token: user_token,
+    });
+    let sendData = {
+        url: Apphelpers.url.fetch_transactions,
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token,
+        },
+        body: bodyData,
+    };
+
+    Apphelpers.sendRequest(sendData, (res) => {
+        if (res) {      
+            const FetchTransactions = res?.data;
+            setUser('FetchTransactions', FetchTransactions);
+        } else {
+            // Apphelpers.flashMessage("error", res.message);
+        }
+    });
+   
+};
+
+
+Myfunctions.FetchCharges = async () => {
+
+    const setUser = useBoundStore.getState().setUser;
+
+
+    let token = sessionStorage.getItem('token');
+    let user_token = sessionStorage.getItem('user_token')
+
+    if (!token || token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+    if (!user_token || user_token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+
+
+    
+    let bodyData = JSON.stringify({
+        category: 'Inbound',
+    });
+    let sendData = {
+        url: Apphelpers.url.fetch_charges,
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token,
+        },
+        body: bodyData,
+    };
+
+    Apphelpers.sendRequest(sendData, (res) => {
+        if (res.status == '00') {      
+            const FetchCharges = res?.details;
+            setUser('FetchCharges', FetchCharges);
+        } else {
+            // Apphelpers.flashMessage("error", res.message);
+        }
+    });
+   
+};
+
+Myfunctions.FetchWallets = async () => {
+
+    const setUser = useBoundStore.getState().setUser;
+
+
+    let token = sessionStorage.getItem('token');
+    let user_token = sessionStorage.getItem('user_token')
+
+    if (!token || token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+    if (!user_token || user_token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+
+
+    
+    let bodyData = JSON.stringify({
+        user_token: user_token,
+    });
+    let sendData = {
+        url: Apphelpers.url.fetch_wallets,
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token,
+        },
+        body: bodyData,
+    };
+
+    Apphelpers.sendRequest(sendData, (res) => {
+        if (res.status == '00') {      
+            const FetchWallets = res?.details;
+            setUser('FetchWallets', FetchWallets);
+        } else {
+            // Apphelpers.flashMessage("error", res.message);
+        }
+    });
+   
+};
+
+Myfunctions.FetchTransactions = async () => {
+
+    const setUser = useBoundStore.getState().setUser;
+
+
+    let token = sessionStorage.getItem('token');
+    let user_token = sessionStorage.getItem('user_token')
+
+    if (!token || token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+    if (!user_token || user_token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+
+
+    
+    let bodyData = JSON.stringify({
+        user_token: user_token,
+    });
+    let sendData = {
+        url: Apphelpers.url.fetch_transactions,
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token,
+        },
+        body: bodyData,
+    };
+
+    Apphelpers.sendRequest(sendData, (res) => {
+        if (res) {      
+            const FetchTransactions = res?.data;
+            setUser('FetchTransactions', FetchTransactions);
+        } else {
+            // Apphelpers.flashMessage("error", res.message);
+        }
+    });
+   
+};
+ 
+Myfunctions.numberFormat = (value) => {
+    const formattedValue = value ? new Intl.NumberFormat().format(value) : "0";
+    return formattedValue.includes(".") ? formattedValue : formattedValue + ".00";
+};
+
+Myfunctions.formatDate = (data) => {
+    let date = new Date(data);
+    let d = date.getDate();
+    let m = date.getMonth() + 1;
+    let y = date.getFullYear();
+  
+    let dateString = (d <= 9 ? '0' + d : d) + '-' + (m <= 9 ? '0' + m : m) + '-' + y;
+    return dateString;
+}
+ 
+ Myfunctions.formatMainDate = (data) => {
+ 
+ 
+    let date = data ? data.split("-") : new Date();
+    let mDate = new Date(date[2], date[1] - 1, date[0]);
+    return mDate.toDateString()
+ }
+
+ Myfunctions.addCommas = (input) => {
+    const formattedValue = input.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return formattedValue;
+  }
+
+ Myfunctions.addEventListenersToTelInputs = () =>{
+    const inputFields = document.querySelectorAll('.formatNumber');
+  
+    inputFields.forEach((inputField) => {
+      inputField.addEventListener('keyup', (event) => {
+        const inputValue = event.target.value;
+        const formattedValue = Myfunctions.addCommas(inputValue);
+        event.target.value = formattedValue;
+      });
+    });
+  }
 
 export default Myfunctions;
