@@ -17,6 +17,9 @@ function SideDashboard() {
 
         <div class="deznav">
             <div class="deznav-scroll">
+                     <Link to="/index" className="brand-logo">
+                        <img src={Images.logo} className='mobs' alt="Logo" />
+                    </Link>
                 
                 <ul class="metismenu" id="menu">                
                 
@@ -50,12 +53,7 @@ function SideDashboard() {
                             <span class="nav-text">Report</span>
                         </Link>
                     </li>
-                    {/* <li className={isLinkActive('/settings')}>
-                        <Link to="/settings" class="ai-icon" aria-expanded="false">
-                            <img src={Images.d4} alt='icons'/>
-                            <span class="nav-text">Settings</span>
-                        </Link>
-                    </li> */}
+                   
                 
                 </ul>
 

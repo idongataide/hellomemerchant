@@ -68,7 +68,7 @@ function Index() {
                     </div>
                     <div class="col-sm-6 col-lg-6 col-md-12 col-sm-12">
                         <div class="card-bx stacked card">
-                            <div class="card-info">
+                            <div class="card-info wall">
                                 <div class="d-flex justify-content-between">
                                     <div className='mb-6'>
                                         <h2 class="num-text text-dark font-w600 mb-3">My Registered Wallet</h2>

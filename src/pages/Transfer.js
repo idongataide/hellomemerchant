@@ -5,6 +5,7 @@ import SideDashboard from '../Components/SideDashboard';
 import TopDashboard from '../Components/TopDashboard';
 import Myfunctions from '../js/MyFuntions';
 import OtpInput from 'react-otp-input';
+import { useNavigate } from 'react-router-dom';
 
 const { Option } = Select;
 
@@ -48,12 +49,12 @@ function Transfer() {
             <TopDashboard />
             <SideDashboard />
             <div className="content-body vh-80">
-                <div className="container-fluid">
+                <div className="container">
                     <div className="row">
                         <div className='title'>
                             <h3 className='pages-head'>Send Money</h3>
                         </div>
-                        <div className="col-lg-6 col-md-12 m-auto">
+                        <div className="col-xl-6 col-lg-9 col-md-12 m-auto">
                             <div className="row bg-transfer">
                                 <h3 className="text-dark mb-3">
                                     Wallet Balance &#8358; {Myfunctions.numberFormat(WalletBalance?.balance)}
@@ -109,7 +110,6 @@ export const OutPreviewTransaction = () => {
     const fetch_charges = useBoundStore(state => state.user.FetchCharges);
     const [loading, setLoading] = useState(false);
 
-    console.log(fetch_charges,'fetch_charges')
 
     useEffect(() => {
         Myfunctions.FetchCharges();
@@ -154,7 +154,7 @@ export const OutPreviewTransaction = () => {
                                         </li>
                                         <li className="details">
                                             <span className="detailstitle">Charges</span>
-                                            <span className="detailsdesc"> &#8358;30</span>
+                                            <span className="detailsdesc"> &#8358;{fetch_charges?.charge}</span>
                                         </li>
                                         <li className="details">
                                             <span className="detailstitle">Date</span>
@@ -185,11 +185,12 @@ export const OutPreviewTransaction = () => {
 export const OutTransferPin = () => {
     const [otp, setOtp] = useState('');
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate()
 
     const handlePinSubmit = (e) => {
         e.preventDefault();
         setLoading(true);
-        Myfunctions.ConfirmPin({ otp, setLoading });
+        Myfunctions.ConfirmPin({ otp, navigate, setLoading });
     };
 
     return (

@@ -2,6 +2,8 @@ const Images = {}
 
 
 Images.logo = '/assets/logo/logo.png';
+Images.fav = '/assets/favicon.png';
+Images.logoWhite = '/assets/logo/logo-light.png';
 Images.envelop = '/assets/images/envelope.png';
 Images.wallet = '/assets/images/wallet.png';
 Images.lady = '/assets/images/pink-lady.png';

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import TopDashboard from '../Components/TopDashboard'
 import SideDashboard from '../Components/SideDashboard'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Myfunctions from '../js/MyFuntions';
 import useBoundStore from '../js/Store/useStore';
 import { jsPDF } from 'jspdf';
@@ -118,7 +118,12 @@ function Report() {
         return matchesSearch && matchesPending && matchesClosed;
     }) || [];
 
+    const navigate = useNavigate();
 
+    const handleRowClick = (transaction_ref) => {
+      navigate(`/transfer/receipt/${transaction_ref}`);
+    };
+  
   return (
     <>
         <TopDashboard/>
@@ -195,7 +200,7 @@ function Report() {
                                                             <tbody>
                                                                 {filteredTransactions && filteredTransactions instanceof Array && filteredTransactions.length > 0 ? (
                                                                     filteredTransactions.map((transaction, i) => (
-                                                                        <tr key={i}>
+                                                                        <tr key={i} onClick={() => handleRowClick(transaction.trans_ref)}>
                                                                             <th>{i + 1}</th>
                                                                             <td>{transaction.ledger_token}</td>
                                                                             <td>{transaction.currency_code}</td>

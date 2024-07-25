@@ -64,14 +64,14 @@
 		});
 	}
 
-	var handleNavigation = function() {
-		$(".nav-control").on('click', function() {
+	// var handleNavigation = function() {
+	// 	$(".nav-control").on('click', function() {
 
-			$('#main-wrapper').toggleClass("menu-toggle");
+	// 		$('#main-wrapper').toggleClass("menu-toggle");
 
-			$(".hamburger").toggleClass("is-active");
-		});
-	}
+	// 		$(".hamburger").toggleClass("is-active");
+	// 	});
+	// }
   
 	var handleCurrentActive = function() {
 		for (var nk = window.location,
@@ -415,7 +415,7 @@
 			handleTheme();
 			handleMetisMenu();
 			handleAllChecked();
-			handleNavigation();
+			// handleNavigation();
 			handleCurrentActive();
 			handleMiniSidebar();
 			handleMinHeight();

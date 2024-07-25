@@ -54,7 +54,8 @@ Apphelpers.url.account_activity = `${baseUrlReport}/account_activity`;
 Apphelpers.url.fetch_disputes = `${baseUrlReport}/fetch_disputes`;
 Apphelpers.url.exports = `${baseUrlReport}/exports`;
 Apphelpers.url.create_dispute = `${baseUrlReport}/create_dispute`;
-Apphelpers.url.fetch_charges = `${baseUrlReport}/fetch_charges`;
+Apphelpers.url.fetch_charges = `${baseUrlTransfer}/fetch_charges`;
+Apphelpers.url.transfer_receipt = `${baseUrlTransfer}/transfer_receipt`;
 
 
 

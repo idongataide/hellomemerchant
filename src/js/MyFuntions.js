@@ -1666,7 +1666,7 @@ Myfunctions.Transfer = async (e, formData, setLoading) => {
     document.querySelector('#ConfirmTransfer').click();
 };
 
-Myfunctions.ConfirmPin = async ({ otp, setLoading }) => {
+Myfunctions.ConfirmPin = async ({ otp, navigate, setLoading }) => {
     setLoading(true);
 
     let token = sessionStorage.getItem('token');
@@ -1701,7 +1701,7 @@ Myfunctions.ConfirmPin = async ({ otp, setLoading }) => {
 
     Apphelpers.sendRequest(sendData, (res) => {
         if (res.status === '00') {
-            Myfunctions.ConfirmTransfer(otp, setLoading);
+            Myfunctions.ConfirmTransfer(otp, navigate, setLoading);
         } else {
             setLoading(false);
             Apphelpers.flashMessage("error", res.message);
@@ -1709,7 +1709,7 @@ Myfunctions.ConfirmPin = async ({ otp, setLoading }) => {
     });
 };
 
-Myfunctions.ConfirmTransfer = async (otp, setLoading) => {
+Myfunctions.ConfirmTransfer = async (otp, navigate, setLoading) => {
     let token = sessionStorage.getItem('token');
     let TransferPreview = useBoundStore.getState().user.TransferPreview;
 
@@ -1744,9 +1744,13 @@ Myfunctions.ConfirmTransfer = async (otp, setLoading) => {
         if (res.status === true) {
             document.querySelector('#closeTransferPinOut').click();
             document.querySelector('#ClosePreviewOut').click();
+            document.querySelector('.modal-backdrop').classList.add('hide')
+            document.querySelector('.modal-backdrop').classList.remove('show')
+            document.querySelector('.modal-backdrop').classList.remove('modal-backdrop')  
+            navigate(`receipt/${res?.transaction_id}`);
             Apphelpers.flashMessage("success", res.message);
         } else {
-            Apphelpers.flashMessage("error", res.message);
+            Apphelpers.flashMessage("error", res.Message);
         }
     });
 };
@@ -2000,6 +2004,54 @@ Myfunctions.FetchTransactions = async () => {
 };
 
 
+Myfunctions.TransferReceipt = async (transaction_id) => {
+
+    const setUser = useBoundStore.getState().setUser;
+
+
+    let token = sessionStorage.getItem('token');
+    let user_token = sessionStorage.getItem('user_token')
+
+  
+    if (!transaction_id || transaction_id === '') {
+        return Apphelpers.flashMessage("error", "Invalid receipt id");
+    }
+    if (!token || token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+    if (!user_token || user_token === '') {
+        return Apphelpers.flashMessage("error", "Invalid request");
+    }
+
+
+    
+    let bodyData = JSON.stringify({
+        transaction_id: 'H-POJ9DZ5G44587',
+    });
+    let sendData = {
+        url: Apphelpers.url.transfer_receipt,
+        method: 'POST',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "h-auth-signature": Apphelpers.signature,
+            "user-auth": token,
+        },
+        body: bodyData,
+    };
+
+    Apphelpers.sendRequest(sendData, (res) => {
+        if (res) {   
+            console.log(res,'TransferReceipt')   
+            const TransferReceipt = res;
+            setUser('TransferReceipt', TransferReceipt);
+        } else {
+            // Apphelpers.flashMessage("error", res.message);
+        }
+    });
+   
+};
+
 Myfunctions.FetchCharges = async () => {
 
     const setUser = useBoundStore.getState().setUser;
@@ -2018,7 +2070,7 @@ Myfunctions.FetchCharges = async () => {
 
     
     let bodyData = JSON.stringify({
-        category: 'Inbound',
+        category: 'Outbound',
     });
     let sendData = {
         url: Apphelpers.url.fetch_charges,
@@ -2034,7 +2086,7 @@ Myfunctions.FetchCharges = async () => {
 
     Apphelpers.sendRequest(sendData, (res) => {
         if (res.status == '00') {      
-            const FetchCharges = res?.details;
+            const FetchCharges = res;
             setUser('FetchCharges', FetchCharges);
         } else {
             // Apphelpers.flashMessage("error", res.message);
