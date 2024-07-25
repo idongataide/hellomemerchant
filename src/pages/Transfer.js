@@ -158,7 +158,7 @@ export const OutPreviewTransaction = () => {
                                         </li>
                                         <li className="details">
                                             <span className="detailstitle">Date</span>
-                                            <span className="detailsdesc"> {Myfunctions.formatDate(confirmdata?.transferDate)}</span>
+                                            <span className="detailsdesc"> {confirmdata?.transferDate}</span>
                                         </li>
                                         <li className="details">
                                             <span className="detailstitle">Narration</span>
