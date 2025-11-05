@@ -63,7 +63,7 @@ function Transfer() {
                                     <div className='col-md-12'>
                                         <div className="form-group">
                                             <label className="form-label mb-1">Beneficiary Bank </label>
-                                            <Select showSearch className='form-control bg-white p-0' filterOption={filterOption} onChange={handleBankChange}>
+                                            <Select showSearch className='form-control bg-white p-0' onChange={handleBankChange}>
                                                 {BankList && BankList?.bank instanceof Array ? BankList?.bank.map(bank => (
                                                     <Option key={bank.id} value={bank.code}>
                                                         {bank.name}

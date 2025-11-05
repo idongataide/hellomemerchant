@@ -356,7 +356,8 @@ Myfunctions.ProfileProgress = async (navigate) => {
                 navigate('/director-profile');
             } else if (res.cac !== '1' || res.director_id !== '1' || res.mermat !== '1' || res.pin_setup !== '1' || res.pof !== '1' ||res.kyb_status !== '0' ||  res.security_question !== 1) {
             // } else if (res.cac !== '1' || res.director_id !== '1' || res.mermat !== '1' || res.pin_setup !== '1' || res.pof !== '1' ||res.kyb_status !== '1' ||  res.security_question !== 1) {
-                navigate('/account-setup');
+                navigate('/index');
+                // navigate('/account-setup');
             }  else{
                 navigate('/index')
             }
@@ -2207,7 +2208,7 @@ Myfunctions.formatDate = (data) => {
  Myfunctions.addCommas = (input) => {
     const formattedValue = input.replace(/\D/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     return formattedValue;
-  }
+}
 
  Myfunctions.addEventListenersToTelInputs = () =>{
     const inputFields = document.querySelectorAll('.formatNumber');
@@ -2219,6 +2220,6 @@ Myfunctions.formatDate = (data) => {
         event.target.value = formattedValue;
       });
     });
-  }
+}
 
 export default Myfunctions;
